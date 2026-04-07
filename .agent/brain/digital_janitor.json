@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "problem_name": "digital_janitor",
+    "alignment_score": 100,
+    "last_sync": "2024-04-07T13:27:00Z"
+  },
+  "intent": {
+    "problem_statement": "A lightweight Micro-SaaS for non-tech-savvy SME owners to manage their online presence through an 'Action Inbox' instead of complex dashboards.",
+    "success_metrics": [
+      "Audit results in strictly less than 2 minutes",
+      "One-click 'Magic Button' for sync across 5+ platforms",
+      "Inbox Zero design (binary state: task or empty)"
+    ]
+  },
+  "constraints": {
+    "technical_stack": [
+      "Next.js 15 (App Router)",
+      "Python 3.12+ (FastAPI)",
+      "Tailwind CSS",
+      "Stripe (Paywall)",
+      "Insites API (Audit)",
+      "Google/Apple/FB APIs (Sync)"
+    ],
+    "performance_requirements": "Audit Scan < 2 minutes",
+    "limitations": [
+      "Binary UI (No analytics/graphs)",
+      "Single Source of Truth (SSOT) data management"
+    ]
+  },
+  "architecture": {
+    "entities": [
+      "User",
+      "BusinessProfile (SSOT)",
+      "AuditReport (Red Flags)",
+      "Task (Action Inbox Item)",
+      "Subscription (Stripe)"
+    ],
+    "logic_flows": [
+      "Async Audit: Input -> Insites API -> Parse Red Flags -> Render",
+      "Sync Trigger: SSOT -> Auth Check -> Multi-API Update",
+      "Event Loop: Webhook/Polling -> Task Generation -> LLM Suggestion -> Execute"
+    ],
+    "state_management": "Server-side state (FastAPI/DB) with immediate UI feedback"
+  },
+  "decisions": [
+    {
+      "issue": "Data-Wahrheit (SSOT)",
+      "status": "COMPLETED",
+      "resolution": "Option A: Aggressives Overwrite. Die interne Datenbank überschreibt bei Sync alle externen APIs bedingungslos."
+    },
+    {
+      "issue": "Audit-Performance & 'Red Flag' Heuristik",
+      "status": "COMPLETED",
+      "resolution": "Split-Strategie: Hohe Sensibilität (Pedant) für den initialen Sales-Report, Hohe Relevanz (Pragmatiker) für die produktive Action Inbox."
+    },
+    {
+      "issue": "Action Inbox: AI-Pipeline & Notifikations-Trigger",
+      "status": "COMPLETED",
+      "resolution": "Option B: Warnsystem für kritische Events (1-2 Sterne), Batch für Rest. AI-Drafting erfolgt im Hintergrund (Zero-Latency for UX)."
+    },
+    {
+      "issue": "Modul 2: 'Magischer Knopf' & Auth-Hürden",
+      "status": "COMPLETED",
+      "resolution": "Option B: Work First, Pay Later (Sunk Cost Flow). User gibt Daten ein und verknüpft Accounts kostenfrei, Paywall erst beim finalen Sync-Trigger."
+    },
+    {
+      "issue": "API Integration: Eigenbau vs. Aggregator",
+      "status": "COMPLETED",
+      "resolution": "Option A: Eigenbau. Direkte Integrationen für Google, Facebook, Apple etc. (Maximale Marge & Unabhängigkeit)."
+    },
+    {
+      "issue": "Design-Sprache",
+      "status": "COMPLETED",
+      "resolution": "Premium Utility Style: Fokus auf Klarheit, Typografie & Trusted Tool, veredelt mit Micro-Animations für den 'Wow'-Faktor."
+    },
+    {
+      "issue": "Audit-UX & Performance (2-Minuten-Limit)",
+      "status": "COMPLETED",
+      "resolution": "Option B: The Storyteller. Cinematic Loader mit animierten Status-Updates und Micro-Onboarding-Cards, während der Scan (Polling) läuft."
+    }
+  ]
+}

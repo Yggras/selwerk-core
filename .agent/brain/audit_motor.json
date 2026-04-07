@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "problem_name": "audit_motor",
+    "alignment_score": 100,
+    "last_sync": "2024-04-07T16:20:00Z"
+  },
+  "intent": {
+    "problem_statement": "Implement Modul 1 (The Audit Motor) as high-value lead capture using Insites API, split-strategy report, and cinematic storyteller UX.",
+    "success_metrics": [
+      "Audit results in strictly less than 120s",
+      "Perceived value of Red Flag report by craftsmen/bakers",
+      "Seamless transition from Lead-Input to Storyteller"
+    ]
+  },
+  "constraints": {
+    "technical_stack": [
+      "Next.js 15 (App Router)",
+      "FastAPI (Python 3.12+)",
+      "Insites API",
+      "Framer Motion"
+    ],
+    "performance_requirements": "Fast status polling (< 2s interval) without hitting Insites rate limits.",
+    "limitations": [
+      "Binary UI (No complex graphs)",
+      "Sync-dependent report (No local data edit in Modul 1)"
+    ]
+  },
+  "architecture": {
+    "entities": [
+      "TargetBusiness (URL, Name, Phone)",
+      "AuditJob (FastAPI worker ref)",
+      "RedFlag (Type, Description, Severity)",
+      "StorytellerCard (Message, Fact, Delay)"
+    ],
+    "logic_flows": [
+      "POST /audit/run -> Insites Trigger -> Polling Loop",
+      "GET /audit/status -> Aggregator Logic -> Storyteller state",
+      "Report Render -> JSON Parse -> Heuristic Filter"
+    ],
+    "state_management": "React Query (Client-side) + FastAPI Task Status (Server-side)"
+  },
+  "decisions": [
+    {
+      "issue": "Heuristic Complexity for 'Pedant' Strategy",
+      "status": "COMPLETED",
+      "resolution": "Option B (Simulierter Flow) + Hybrid-Input. Die Storyteller-Karten laufen in einer Zeit-Schleife, Firmenname/Logo werden dynamisch nachgeladen."
+    },
+    {
+      "issue": "Logic of 'Red Flag' Extraction: Pedant vs. Pragmatiker",
+      "status": "COMPLETED",
+      "resolution": "Option A (Hardcoded Rules) für Modul 1. Schnelle, deterministische Python-Heuristik für den Erst-Report."
+    },
+    {
+      "issue": "Error States & Zero-Results Handling",
+      "status": "COMPLETED",
+      "resolution": "Option A (Ehrliche Kommunikation). Wenn kein Audit möglich ist, direkt zur manuellen Datenpflege (Modul 2) leiten."
+    },
+    {
+      "issue": "Lead-Capture Trigger & Transition UX",
+      "status": "COMPLETED",
+      "resolution": "Option B (Teaser-Flow). Sofortiger Teil-Report, volle Details gegen E-Mail. UX-Transition via Clean Fade."
+    }
+  ]
+}

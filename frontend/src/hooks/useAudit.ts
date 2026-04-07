@@ -18,6 +18,11 @@ export interface AuditSummary {
   overall_score?: number;
   red_flags_count: number;
   public_flags: RedFlag[];
+  detected_data?: {
+    detected_name?: string;
+    detected_address?: string;
+    detected_phone?: string;
+  };
 }
 
 export function useAudit() {

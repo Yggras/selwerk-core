@@ -21,7 +21,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/digitaljanitor
+      - DATABASE_URL=postgresql+asyncpg://user:password@db:5432/digitaljanitor
       - INSITES_API_KEY=${INSITES_API_KEY}
     depends_on:
       - db

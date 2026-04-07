@@ -7,9 +7,10 @@ import { useState } from "react";
 
 interface AuditReportProps {
   data: AuditSummary;
+  onUnlock: (email: string) => void;
 }
 
-export function AuditReport({ data }: AuditReportProps) {
+export function AuditReport({ data, onUnlock }: AuditReportProps) {
   const [email, setEmail] = useState("");
   const [isGated, setIsGated] = useState(true);
 
@@ -102,7 +103,7 @@ export function AuditReport({ data }: AuditReportProps) {
                             </div>
                             <button 
                                 className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 group"
-                                onClick={() => alert("Registrierung Logik folgt in Modul 2")}
+                                onClick={() => onUnlock(email)}
                             >
                                 Jetzt Report freischalten
                                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />

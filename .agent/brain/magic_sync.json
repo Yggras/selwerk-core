@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "problem_name": "magic_sync",
+    "alignment_score": 100,
+    "last_sync": "2024-04-07T16:43:00Z"
+  },
+  "intent": {
+    "problem_statement": "Implement Modul 2 (Magic Sync & User Data) focusing on SSOT Management, Stripe Integration (Pay-later), and Mock Sync Visualization.",
+    "success_metrics": [
+      "User can edit their 'Master Profile' with zero friction",
+      "Stripe checkout triggers at the peak of 'Value Delivery'",
+      "Mock sync provides immediate visual satisfaction"
+    ]
+  },
+  "constraints": {
+    "technical_stack": [
+      "FastAPI (SQLAlchemy)",
+      "PostgreSQL",
+      "Stripe API",
+      "Next.js Forms"
+    ],
+    "performance_requirements": "Sync state must be persistent and reflected in the UI in near real-time.",
+    "limitations": [
+      "No real OAuth for now (Mock Sync)",
+      "Single-user context for MVP (no multi-location / franchise support yet)"
+    ]
+  },
+  "architecture": {
+    "entities": [
+      "Profile (Master Data: Name, Address, Phone, Hours)",
+      "SyncJob (Status: Pending, Paid, Completed)",
+      "User (Link to Email, StripeCustomerID)"
+    ],
+    "logic_flows": [
+      "Audit -> Email Entry -> Profile Creation (Auto-populated from Audit)",
+      "Profile Edit -> Save to DB",
+      "Sync Trigger -> Stripe Checkout -> Webhook -> Mock Sync Start"
+    ],
+    "state_management": "React Hook Form + React Query"
+  },
+  "decisions": [
+    {
+      "issue": "The 'Pay-Later' Injection Point",
+      "status": "COMPLETED",
+      "resolution": "Option B (Success Preview). Wir simulieren die ersten 90% des Syncs, bevor Stripe zur finalen Freischaltung eingeblendet wird."
+    },
+    {
+      "issue": "SSOT Maintenance & Change Management",
+      "status": "COMPLETED",
+      "resolution": "Option B (Action-Based). Änderungen im Profil erzeugen neue Tasks in der Action Inbox für volle Kontrolle."
+    },
+    {
+      "issue": "Account Creation Timing & Session Persistence",
+      "status": "COMPLETED",
+      "resolution": "Option B (Shadow Profile). Nutzer editiert anonym, Registrierung erst beim finalen Sync-Trigger."
+    },
+    {
+      "issue": "Sync Progress Visualization Style",
+      "status": "COMPLETED",
+      "resolution": "Option A (Command Center). Kombination aus Plattform-Kacheln und technischem Live-Log für maximale 'Authority'."
+    }
+  ]
+}

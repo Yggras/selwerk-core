@@ -26,6 +26,7 @@ class AuditSummary(BaseModel):
     overall_score: Optional[int] = None
     red_flags_count: int
     public_flags: List[RedFlag] # The "Teaser" content
+    detected_data: Optional[Dict[str, Any]] = None
 
 class AuditDetails(AuditSummary):
     private_flags: List[RedFlag] # The full list (gated)

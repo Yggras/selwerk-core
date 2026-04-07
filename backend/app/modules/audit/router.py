@@ -61,13 +61,22 @@ async def get_status(report_id: str):
     # Lead Gen: Only show first 2 flags publicly
     public_flags = all_flags[:2]
 
+    # Extract detected data for SSOT pre-population
+    local_data = job.get("data", {}).get("local_presence", {})
+    detected_data = {
+        "detected_name": local_data.get("detected_name"),
+        "detected_address": local_data.get("detected_address"),
+        "detected_phone": local_data.get("detected_phone"),
+    }
+
     return AuditSummary(
         report_id=report_id,
         status=job["status"],
         progress=job["progress"],
         overall_score=job.get("data", {}).get("overall_score"),
         red_flags_count=len(all_flags),
-        public_flags=public_flags
+        public_flags=public_flags,
+        detected_data=detected_data
     )
 
 @router.get("/details/{report_id}", response_model=AuditDetails)

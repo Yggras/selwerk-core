@@ -9,7 +9,7 @@ import { SyncDashboard } from "@/components/sync/SyncDashboard";
 import { useAudit } from "@/hooks/useAudit";
 import { useSync } from "@/hooks/useSync";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, LogOut, TrendingUp, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, LogOut, TrendingUp, CheckCircle2, Settings, ArrowRight } from "lucide-react";
 import { DigiScoreGauge } from "@/components/dashboard/DigiScoreGauge";
 import { GrowthFeed } from "@/components/dashboard/GrowthFeed";
 import { useRouter } from "next/navigation";
@@ -200,6 +200,28 @@ export default function DashboardPage() {
                                 </p>
                            </div>
                         </div>
+
+                        {/* ── Master Profile CTA ──────── */}
+                        <button
+                            id="master-profile-cta"
+                            onClick={() => router.push("/dashboard/profile")}
+                            className="w-full bg-white border-2 border-dashed border-primary/20 text-slate-800 p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-primary/40 hover:-translate-y-1 transition-all duration-500 hover:shadow-xl hover:shadow-primary/5 text-left"
+                        >
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+                            <div className="flex items-center gap-3 mb-4 relative z-10">
+                                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+                                    <Settings size={20} />
+                                </div>
+                                <span className="text-sm font-black uppercase tracking-widest text-slate-800">Master-Profil</span>
+                            </div>
+                            <p className="text-slate-500 font-medium leading-relaxed mb-6 relative z-10 text-sm">
+                                Stammdaten zentral verwalten und auf alle Plattformen synchronisieren.
+                            </p>
+                            <div className="flex items-center gap-2 text-primary font-bold text-sm relative z-10 group-hover:gap-3 transition-all">
+                                Profil bearbeiten
+                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            </div>
+                        </button>
 
                         <div className="bg-primary-dark border border-primary-dark/20 text-white p-10 rounded-[2.5rem] relative overflow-hidden shadow-2xl group hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,175,156,0.2)]">
                             {/* Shine Effect */}

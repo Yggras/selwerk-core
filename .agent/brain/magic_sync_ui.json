@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "problem_name": "magic_sync_ui",
+    "alignment_score": 100,
+    "last_sync": "2026-04-09T15:43:00+02:00"
+  },
+  "intent": {
+    "problem_statement": "Implementation des Frontend UIs für Modul 2: SSOT Master-Profile Editor und Magic Sync Command Center (ohne Stripe/Pay-Later für reduzierte Komplexität).",
+    "success_metrics": []
+  },
+  "constraints": {
+    "technical_stack": [
+      "Next.js 15 (App Router)",
+      "React Hook Form",
+      "Framer Motion / GSAP",
+      "TailwindCSS"
+    ],
+    "performance_requirements": "Flüssiges Ausfüllen, Instant Feedback beim Senden",
+    "limitations": [
+      "Mock-Synchronisation (nur visuelles Feedback)",
+      "Keine Payment-Integration",
+      "/dashboard/profile and /dashboard/sync-center as dedicated Next.js routes"
+    ]
+  },
+  "architecture": {
+    "entities": ["Profile", "SyncJob"],
+    "logic_flows": ["Nav to /dashboard/profile -> Click 'Sync' -> router.push('/dashboard/sync-center') -> Cinematic Sync Mock -> router.push('/dashboard')"],
+    "state_management": "Next.js App Router for navigation context"
+  },
+  "decisions": [
+    {
+      "issue": "UX Flow of Profile Editor",
+      "status": "COMPLETED",
+      "resolution": "Option A (Single-Page Control Panel). A unified, efficient form highlighting 'Red Flags' directly inline. Chosen for its 'Premium Utility' vibe."
+    },
+    {
+      "issue": "Routing Architecture for SSOT and Command Center",
+      "status": "COMPLETED",
+      "resolution": "Option B (Isolierte Routes). Dedicated /dashboard/profile and /dashboard/sync-center routes for clean encapsulation of GSAP animations and modular state."
+    },
+    {
+      "issue": "Mock Sync Technical Depth",
+      "status": "COMPLETED",
+      "resolution": "Option A (Frontend Theatre). Use a React useEffect loop to simulate progress and animate GSAP for speed. Future-proofing: The sync logic will be wrapped in a custom hook (e.g. `useMagicSync`) so it can be cleanly swapped for real API polling (Google/Apple) in the future."
+    }
+  ]
+}

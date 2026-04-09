@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "problem_name": "mock_data_journey",
+    "alignment_score": 25,
+    "last_sync": "2026-04-09T20:00:10Z"
+  },
+  "intent": {
+    "problem_statement": "Add a comprehensive set of mock data to the Digi-check (Audit) that brings 3 Action Items per category (Listing, Reputation, Social Media, Website) and maps them to specific product modules.",
+    "success_metrics": [
+      "Landing -> Registration -> Scan -> Result flow is seamless",
+      "Scan results show 3+ action items per category",
+      "Clicking an action item redirects to the corresponding feature placeholder",
+      "Design feels premium and 'Sellwerk' branded"
+    ]
+  },
+  "constraints": {
+    "technical_stack": [
+      "Next.js 15 (App Router)",
+      "FastAPI Backend",
+      "GSAP/Framer Motion for animations"
+    ],
+    "performance_requirements": "Fast loading of mock data, smooth transitions between flow steps",
+    "limitations": [
+      "Features (Master Profile, Reputation Mgmt, etc.) are placeholders for now",
+      "Data is hardcoded/mocked for the prototype"
+    ]
+  },
+  "architecture": {
+    "entities": [
+      {
+        "name": "ActionItem",
+        "fields": ["id", "category", "title", "description", "severity", "impact", "target_route", "cta_label"]
+      },
+      {
+        "name": "AuditCategory",
+        "fields": ["name", "item_count", "status", "icon"]
+      }
+    ],
+    "logic_flows": [
+      "Landing (Search) -> Registration -> Scan Storyteller",
+      "Scan Storyteller -> Discovery Dashboard ('We found problems')",
+      "Discovery Dashboard -> [Strategic Reveal Transition] -> Priority Action List",
+      "Priority Action List -> [Click] -> Deep link to Feature Module"
+    ],
+    "state_management": "Local state / React Context for progress, potentially backend persistence for 'simulated' reality"
+  },
+  "decisions": [
+    {
+      "issue": "UX Strategy for Audit Results",
+      "status": "COMPLETED",
+      "resolution": "Option B (Strategic Reveal). A multi-stage reveal starting with 'Problems Found' followed by a cinematic transition to a 'Priority Action List'."
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "problem_name": "dashboard_unified_view",
+    "alignment_score": 60,
+    "last_sync": "2026-04-09"
+  },
+  "intent": {
+    "problem_statement": "The application currently has two disjointed views: a 'Main Dashboard' (Overview) and an 'Audit Report' (Results). Switching between them feels 'weird' as they behave like separate apps rather than a unified product experience.",
+    "success_metrics": [
+      "Unified UX where Audit Results are actionable metadata within the Dashboard",
+      "Clear navigation path between Overview and specific Scan details",
+      "No more 'view-switching' that loses context of the product core"
+    ]
+  },
+  "constraints": {
+    "technical_stack": ["Next.js 15", "Framer Motion", "TailwindCSS"],
+    "performance_requirements": "Instant transition between report and overview",
+    "limitations": ["Must remain mobile-friendly", "Must keep the 'Pro Janitor' feeling"]
+  },
+  "architecture": {
+    "entities": ["GrowthFeed", "AuditReport", "DigiScoreGauge", "Recommendation"],
+    "logic_flows": [
+      "Scan Finish -> Transform Red Flags to Recommendations",
+      "Inject Recommendations into useSync state",
+      "Trigger View Transition back to 'dashboard' Overview"
+    ],
+    "state_management": "Unified Dashboard State (useSync as SSOT)"
+  },
+  "decisions": [
+    {
+      "date": "2026-04-09",
+      "title": "Selected Option A: Feed-Injection Model",
+      "rationale": "Direct conversion of audit results into actionable tasks leads to higher user engagement and a cohesive SaaS product experience."
+    }
+  ]
+}

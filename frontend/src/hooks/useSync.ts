@@ -114,6 +114,7 @@ export function useSync() {
       const data = await res.json();
       localStorage.setItem("user_email", data.email);
       localStorage.setItem("user_token", data.token);
+      document.cookie = `auth-token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
       setEmail(data.email);
       setToken(data.token);
       return data;
@@ -143,6 +144,21 @@ export function useSync() {
     }
   });
 
+  const ingestAuditMutation = useMutation({
+    mutationFn: async (payload: { report_id: string; email: string }) => {
+      const res = await fetch(`${API_BASE}/ingest-audit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+        profileQuery.refetch();
+        recommendationsQuery.refetch();
+    }
+  });
+
   return {
     profile: profileQuery.data,
     updateProfile: updateProfileMutation.mutate,
@@ -162,9 +178,12 @@ export function useSync() {
     recommendations: recommendationsQuery.data || [],
     isLoadingRecs: recommendationsQuery.isLoading,
     completeRecommendation: completeRecMutation.mutate,
+    ingestAudit: ingestAuditMutation.mutateAsync,
+    isIngesting: ingestAuditMutation.isPending,
     logout: () => {
         localStorage.removeItem("user_email");
         localStorage.removeItem("user_token");
+        document.cookie = "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         setEmail(null);
         setToken(null);
     }

@@ -51,3 +51,7 @@ class AuthResponse(BaseModel):
     email: EmailStr
     token: str
     profile: Optional[ProfileResponse] = None
+
+class AuditIngestRequest(BaseModel):
+    report_id: str
+    email: EmailStr

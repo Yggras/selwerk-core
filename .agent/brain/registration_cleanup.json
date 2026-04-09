@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "problem_name": "registration_cleanup",
+    "alignment_score": 75,
+    "last_sync": "2026-04-09T13:06:50+02:00"
+  },
+  "intent": {
+    "problem_statement": "Refactor registration flow to include a landing page with CTA, and restrict Digi-check access to logged-in users only.",
+    "success_metrics": [
+      "Landing page with CTA button is the entry point.",
+      "Registration flow is cleaned up/restructured.",
+      "Digi-check is only accessible after login/registration.",
+      "User experience is seamless from landing to check.",
+      "Routes are clearly separated (/, /login, /dashboard)."
+    ]
+  },
+  "constraints": {
+    "technical_stack": ["Next.js (Frontend)", "Python/FastAPI (Backend)"],
+    "performance_requirements": "Fast transition from landing to registration.",
+    "limitations": ["Prototype stage focus."]
+  },
+  "architecture": {
+    "entities": ["User", "RegistrationSession", "DigiCheck"],
+    "logic_flows": ["Landing (/) -> Auth (/login) -> Dashboard (/dashboard) -> Auto-start Scan"],
+    "state_management": "SessionStorage for pending_url; Next.js App Router for navigation."
+  },
+  "decisions": [
+    {
+      "id": 1,
+      "question": "Post-registration navigation flow",
+      "choice": "Option A (Narrative Flow / Direct-To-Action)",
+      "rationale": "Minimize friction; user is redirected straight to the action they intended."
+    },
+    {
+      "id": 2,
+      "question": "Landing Page Input Strategy",
+      "choice": "Option A (The Hook - URL Input on Landing)",
+      "rationale": "Increases user investment and leads to higher conversion in the registration step."
+    },
+    {
+      "id": 3,
+      "question": "Routing Architecture",
+      "choice": "Option A (Clean Split - Routes)",
+      "rationale": "Better SEO, cleaner code, and separation of marketing vs. application logic."
+    }
+  ]
+}

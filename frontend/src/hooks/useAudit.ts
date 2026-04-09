@@ -32,12 +32,17 @@ export function useAudit() {
 
   const triggerMutation = useMutation({
     mutationFn: async (payload: { url: string; business_name?: string }) => {
+      const token = localStorage.getItem("user_token");
       const res = await fetch(`${API_BASE}/run`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Audit failed");
       setReportId(data.reportId);
       setIsStorytellerActive(true);
       
@@ -53,7 +58,12 @@ export function useAudit() {
     queryKey: ["auditStatus", reportId],
     queryFn: async () => {
       if (!reportId) return null;
-      const res = await fetch(`${API_BASE}/status/${reportId}`);
+      const token = localStorage.getItem("user_token");
+      const res = await fetch(`${API_BASE}/status/${reportId}`, {
+        headers: {
+            "Authorization": `Bearer ${token}`
+        }
+      });
       return (await res.json()) as AuditSummary;
     },
     enabled: !!reportId,

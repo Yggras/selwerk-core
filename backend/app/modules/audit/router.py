@@ -1,17 +1,21 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Header, Depends
 from .schemas import AuditRequest, AuditSummary, AuditDetails, AuditStatus, RedFlag
 from .engine import InsitesClient, RuleParser
-from typing import Dict, List
+from typing import Dict, List, Optional
 import uuid
 
 router = APIRouter(prefix="/audit", tags=["Audit"])
 client = InsitesClient()
 
-# Simple in-memory storage for MVP. In Production, this would be Redis/PostgreSQL.
-audit_store: Dict[str, Dict] = {}
+from .store import audit_store
+
+def get_current_user(authorization: Optional[str] = Header(None)):
+    if not authorization or not authorization.startswith("Bearer mock_token_"):
+        raise HTTPException(status_code=401, detail="Unauthorized - Bitte loggen Sie sich ein.")
+    return authorization
 
 @router.post("/run", response_model=Dict[str, str])
-async def run_audit(request: AuditRequest):
+async def run_audit(request: AuditRequest, user_token: str = Depends(get_current_user)):
     report_id = await client.trigger_report(request.url, request.business_name)
     if not report_id:
         raise HTTPException(status_code=422, detail="Starting audit failed")
@@ -27,7 +31,7 @@ async def run_audit(request: AuditRequest):
     return {"reportId": report_id}
 
 @router.get("/status/{report_id}", response_model=AuditSummary)
-async def get_status(report_id: str):
+async def get_status(report_id: str, user_token: Optional[str] = Depends(get_current_user)):
     if report_id not in audit_store:
         # Check if it was a real Insites ID not in current memory (after restart)
         insites_data = await client.fetch_report(report_id)
@@ -58,8 +62,8 @@ async def get_status(report_id: str):
     all_flags = RuleParser.extract_red_flags(job.get("data", {}), pedant=True)
     
     # Public vs Private split (Server-side Gating)
-    # Lead Gen: Only show first 2 flags publicly
-    public_flags = all_flags[:2]
+    # If user is authenticated, they get all flags now.
+    public_flags = all_flags if user_token else all_flags[:2]
 
     # Extract detected data for SSOT pre-population
     local_data = job.get("data", {}).get("local_presence", {})
@@ -80,7 +84,7 @@ async def get_status(report_id: str):
     )
 
 @router.get("/details/{report_id}", response_model=AuditDetails)
-async def get_details(report_id: str, email: str):
+async def get_details(report_id: str, user_token: str = Depends(get_current_user), db_email: Optional[str] = None):
     # This endpoint is "gated" by email being provided. 
     # In Modul 2, we would link this to a real User Session.
     if report_id not in audit_store:

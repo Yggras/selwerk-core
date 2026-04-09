@@ -5,14 +5,72 @@ from app.database import get_db
 from app.models import User, Profile, SyncJob, GrowthRecommendation
 from .schemas import (
     ProfileUpdate, ProfileResponse, SyncTriggerRequest, 
-    SyncStatusResponse, RecommendationResponse, MagicLoginRequest, AuthResponse
+    SyncStatusResponse, RecommendationResponse, MagicLoginRequest, AuthResponse,
+    AuditIngestRequest
 )
 from .engine import SyncEngine
+from app.modules.audit.store import audit_store
+from app.modules.audit.engine import RuleParser
 from typing import Optional, List
 import uuid
 
 router = APIRouter(prefix="/sync", tags=["Magic Sync"])
 engine = SyncEngine()
+
+@router.post("/ingest-audit")
+async def ingest_audit(
+    request: AuditIngestRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    # 1. Fetch Audit Data
+    if request.report_id not in audit_store:
+        raise HTTPException(status_code=404, detail="Audit report not found in memory")
+    
+    audit_data = audit_store[request.report_id]
+    if audit_data["status"] != "complete":
+        raise HTTPException(status_code=400, detail="Audit is not complete yet")
+
+    # 2. Find User and Profile
+    result = await db.execute(select(User).where(User.email == request.email))
+    user = result.scalars().first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found. Please log in first.")
+
+    result = await db.execute(select(Profile).where(Profile.user_id == user.id))
+    profile = result.scalars().first()
+    if not profile:
+        profile = Profile(user_id=user.id, business_name=audit_data.get("name", "Dein Business"))
+        db.add(profile)
+        await db.flush()
+
+    # 3. Transform Red Flags to Recommendations
+    all_flags = RuleParser.extract_red_flags(audit_data.get("data", {}), pedant=True)
+    
+    # Idempotenz: Clear existing pending recommendations to avoid duplicates on re-scan
+    await db.execute(
+        update(GrowthRecommendation)
+        .where(GrowthRecommendation.profile_id == profile.id)
+        .where(GrowthRecommendation.status == "pending")
+        .values(status="obsolete")
+    )
+
+    new_recs = []
+    for flag in all_flags:
+        new_recs.append(GrowthRecommendation(
+            profile_id=profile.id,
+            title=flag.title,
+            description=flag.description,
+            impact=10 if flag.severity == "high" else 5,
+            status="pending"
+        ))
+    
+    db.add_all(new_recs)
+
+    # 4. Update Digi-Score
+    profile.digi_score = audit_data.get("data", {}).get("overall_score", 42)
+    
+    await db.commit()
+    return {"status": "success", "recommendations_count": len(new_recs), "new_score": profile.digi_score}
 
 @router.get("/profile", response_model=ProfileResponse)
 async def get_profile(

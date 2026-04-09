@@ -8,11 +8,11 @@ import { useState } from "react";
 interface AuditReportProps {
   data: AuditSummary;
   onUnlock: (email: string) => void;
+  isGated?: boolean;
 }
 
-export function AuditReport({ data, onUnlock }: AuditReportProps) {
+export function AuditReport({ data, onUnlock, isGated = true }: AuditReportProps) {
   const [email, setEmail] = useState("");
-  const [isGated, setIsGated] = useState(true);
 
   const scoreColor = data.overall_score !== undefined
     ? data.overall_score > 70 ? "text-green-500" : data.overall_score > 40 ? "text-amber-500" : "text-red-500"
@@ -102,7 +102,7 @@ export function AuditReport({ data, onUnlock }: AuditReportProps) {
                                 />
                             </div>
                             <button 
-                                className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 group"
+                                className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 group"
                                 onClick={() => onUnlock(email)}
                             >
                                 Jetzt Report freischalten

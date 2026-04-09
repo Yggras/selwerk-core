@@ -12,9 +12,10 @@ function cn(...inputs: ClassValue[]) {
 interface SearchInputProps {
   onSearch: (url: string) => void;
   isLoading?: boolean;
+  placeholder?: string;
 }
 
-export function SearchInput({ onSearch, isLoading }: SearchInputProps) {
+export function SearchInput({ onSearch, isLoading, placeholder }: SearchInputProps) {
   const [url, setUrl] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,7 +39,7 @@ export function SearchInput({ onSearch, isLoading }: SearchInputProps) {
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Gib deine Website-URL ein (z.B. mueller-brot.de)"
+          placeholder={placeholder || "Gib deine Website-URL ein (z.B. mueller-brot.de)"}
           disabled={isLoading}
           className="flex-1 bg-transparent py-3 px-2 outline-none text-slate-700 placeholder:text-slate-400 disabled:opacity-50"
         />

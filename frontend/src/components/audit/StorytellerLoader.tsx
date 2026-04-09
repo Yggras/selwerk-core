@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { CheckCircle2, ShieldCheck, Search, Database, Globe } from "lucide-react";
+import { ShieldCheck, Search, Database, Globe, Target } from "lucide-react";
 
 interface StoryCard {
   title: string;
@@ -12,23 +12,23 @@ interface StoryCard {
 
 const CARDS: StoryCard[] = [
   {
-    title: "Initialisiere Deep-Scan",
-    description: "Wir verknüpfen uns mit über 40 Plattformen weltweit.",
+    title: "Netzwerk-Initialisierung",
+    description: "Wir verknüpfen uns mit dem SELLWERK Partner-Netzwerk (42+ Plattformen).",
     icon: Search,
   },
   {
-    title: "Abgleich der Stammdaten",
-    description: "Wir prüfen Name, Adresse und Telefonnummer auf Inkonsistenzen.",
+    title: "Integritäts-Prüfung",
+    description: "Wir validieren Ihre Stammdaten gegen globale Verzeichnis-Standards.",
     icon: Database,
   },
   {
-    title: "Google Maps Analyse",
-    description: "Stimmt dein Pin? Wir prüfen die geographische Korrektheit.",
-    icon: Globe,
+    title: "GEO-Lokalisierung",
+    description: "Prüfung Ihrer lokalen Sichtbarkeit und Google Maps Platzierung.",
+    icon: Target,
   },
   {
-    title: "Reputationscheck",
-    description: "Wir scannen aktuelle Bewertungen auf kritische Signale.",
+    title: "Reputations-Audit",
+    description: "Analyse Ihrer Online-Bewertungen auf wettbewerbsrelevante Signale.",
     icon: ShieldCheck,
   },
 ];
@@ -50,32 +50,32 @@ export function StorytellerLoader({ progress }: StorytellerLoaderProps) {
   const currentCard = CARDS[currentCardIndex];
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] w-full max-w-lg mx-auto py-12 px-6">
+    <div className="flex flex-col items-center justify-center min-h-[450px] w-full max-w-xl mx-auto py-16 px-8 font-sans">
       {/* Animated Icon Circle */}
-      <div className="relative mb-12">
+      <div className="relative mb-14">
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full blur-2xl opacity-20"
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-0 bg-primary/20 rounded-full blur-3xl opacity-30"
         />
-        <div className="relative w-24 h-24 bg-white rounded-3xl shadow-2xl flex items-center justify-center border border-slate-100">
+        <div className="relative w-28 h-28 bg-white rounded-[2rem] shadow-2xl flex items-center justify-center border border-slate-100">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentCardIndex}
-              initial={{ scale: 0.5, opacity: 0, rotate: -20 }}
+              initial={{ scale: 0.8, opacity: 0, rotate: -15 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              exit={{ scale: 1.5, opacity: 0, rotate: 20 }}
-              transition={{ duration: 0.5 }}
-              className="text-blue-600"
+              exit={{ scale: 1.2, opacity: 0, rotate: 15 }}
+              transition={{ duration: 0.6, ease: "backOut" }}
+              className="text-primary"
             >
-              <currentCard.icon size={40} />
+              <currentCard.icon size={48} />
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
 
       {/* Card Text */}
-      <div className="text-center h-28">
+      <div className="text-center h-32">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentCardIndex}
@@ -84,10 +84,10 @@ export function StorytellerLoader({ progress }: StorytellerLoaderProps) {
             exit={{ y: -20, opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h3 className="text-2xl font-bold text-slate-800 mb-2">
+            <h3 className="text-3xl font-display font-black text-slate-900 mb-3 tracking-tight">
               {currentCard.title}
             </h3>
-            <p className="text-slate-500 text-lg leading-relaxed">
+            <p className="text-slate-500 text-lg font-medium leading-relaxed max-w-sm mx-auto">
               {currentCard.description}
             </p>
           </motion.div>
@@ -95,25 +95,25 @@ export function StorytellerLoader({ progress }: StorytellerLoaderProps) {
       </div>
 
       {/* Progress Bar Area */}
-      <div className="w-full mt-12">
-        <div className="flex justify-between items-end mb-3">
-          <span className="text-sm font-semibold text-blue-600 uppercase tracking-wider">
-            Deep Scan Fortschritt
+      <div className="w-full mt-16">
+        <div className="flex justify-between items-end mb-4">
+          <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+            Deep-Scan Status
           </span>
-          <span className="text-2xl font-black text-slate-300">
+          <span className="text-3xl font-display font-black text-slate-200 tabular-nums">
             {progress}%
           </span>
         </div>
-        <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-4 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100 p-1">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            transition={{ type: "spring", stiffness: 50, damping: 20 }}
-            className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
+            transition={{ type: "spring", stiffness: 30, damping: 15 }}
+            className="h-full bg-primary rounded-full shadow-lg shadow-primary/20"
           />
         </div>
-        <p className="text-center mt-4 text-xs text-slate-400 font-medium italic">
-          "Qualität braucht einen Moment. Wir graben tief..."
+        <p className="text-center mt-6 text-[10px] text-slate-400 font-black uppercase tracking-[0.1em]">
+          SELLWERK Artificial Intelligence Analysis Engine
         </p>
       </div>
     </div>

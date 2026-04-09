@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Save, Building2, MapPin, Phone, Globe, Clock, Loader2, Sparkles } from "lucide-react";
+import { Save, Building2, MapPin, Phone, Globe, Clock, Loader2, Target } from "lucide-react";
 import { motion } from "framer-motion";
 
 const profileSchema = z.object({
@@ -54,106 +54,109 @@ export function ProfileEditor({ initialData, onSave, isLoading }: ProfileEditorP
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="w-full max-w-3xl mx-auto bg-white rounded-[2.5rem] shadow-2xl shadow-blue-500/5 border border-slate-100 overflow-hidden"
+      className="w-full max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden font-sans"
     >
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-10 text-white">
-        <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center">
-                <Sparkles size={18} />
-            </div>
-            <span className="text-xs font-bold uppercase tracking-widest opacity-80">Master Profil Management</span>
+      <div className="bg-primary px-10 py-12 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+                  <Target size={22} />
+              </div>
+              <span className="text-sm font-black uppercase tracking-[0.2em] opacity-90">Daten-Verifizierung</span>
+          </div>
+          <h2 className="text-4xl font-display font-black tracking-tight">Ihre Schaltzentrale</h2>
+          <p className="text-white/80 mt-3 text-lg font-medium max-w-xl">Diese Daten bilden die „Single Source of Truth“ für alle 42+ Plattformen im SELLWERK Netzwerk.</p>
         </div>
-        <h2 className="text-3xl font-bold">Deine Schaltzentrale</h2>
-        <p className="text-blue-100 mt-2">Diese Daten bilden die „Single Source of Truth“ für alle 40+ Portale.</p>
       </div>
 
-      <form onSubmit={handleSubmit(onSave)} className="p-8 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit(onSave)} className="p-10 space-y-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Business Name */}
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <Building2 size={16} className="text-blue-500" />
+          <div className="space-y-3">
+            <label className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+              <Building2 size={16} className="text-primary" />
               Unternehmensname
             </label>
             <input
               {...register("business_name")}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-medium text-slate-700"
               placeholder="z.B. Bäckerei Müller GmbH"
             />
-            {errors.business_name && <p className="text-red-500 text-xs">{errors.business_name.message}</p>}
+            {errors.business_name && <p className="text-red-500 text-xs font-bold">{errors.business_name.message}</p>}
           </div>
 
           {/* Address */}
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <MapPin size={16} className="text-blue-500" />
+          <div className="space-y-3">
+            <label className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+              <MapPin size={16} className="text-primary" />
               Adresse
             </label>
             <input
               {...register("address")}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-medium text-slate-700"
               placeholder="Straße, Hausnummer, PLZ & Stadt"
             />
           </div>
 
           {/* Phone */}
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <Phone size={16} className="text-blue-500" />
+          <div className="space-y-3">
+            <label className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+              <Phone size={16} className="text-primary" />
               Telefon
             </label>
             <input
               {...register("phone")}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-medium text-slate-700"
               placeholder="+49 123 456789"
             />
           </div>
 
           {/* Website */}
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <Globe size={16} className="text-blue-500" />
+          <div className="space-y-3">
+            <label className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+              <Globe size={16} className="text-primary" />
               Website
             </label>
             <input
               {...register("website")}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+              className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-5 focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-medium text-slate-700"
               placeholder="https://deine-website.de"
             />
           </div>
         </div>
 
-        {/* Hours section (Simplified for MVP) */}
-        <div className="pt-6 border-t border-slate-100">
-            <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2 mb-4">
-                <Clock size={16} className="text-blue-500" />
-                Öffnungszeiten (Beispielhaft)
+        {/* Hours section */}
+        <div className="pt-8 border-t border-slate-100">
+            <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2 mb-6">
+                <Clock size={16} className="text-primary" />
+                Öffnungszeiten
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Mo - Fr</span>
-                    <input {...register("hours.mon")} className="bg-transparent font-semibold text-slate-700 outline-none w-full" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-2">Mo - Fr</span>
+                    <input {...register("hours.mon")} className="bg-transparent font-bold text-slate-800 outline-none w-full" />
                 </div>
             </div>
         </div>
 
-        <div className="pt-8">
+        <div className="pt-10">
           <button
             type="submit"
             disabled={isLoading || !isDirty}
-            className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="w-full bg-slate-900 text-white font-black py-5 rounded-[1.5rem] hover:bg-primary transition-all shadow-2xl shadow-slate-900/10 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed group text-lg"
           >
             {isLoading ? (
               <Loader2 className="animate-spin" />
             ) : (
               <>
-                <Save size={20} className="group-hover:scale-110 transition-transform" />
-                Master-Daten validieren & speichern
+                <Save size={22} className="group-hover:scale-110 transition-transform" />
+                Master-Profil validieren & synchronisieren
               </>
             )}
           </button>
-          <p className="text-center text-[10px] text-slate-400 mt-4 leading-relaxed px-12">
-            Nach der Speicherung kannst du den „Magic Sync“ starten, um diese Daten auf allen Plattformen abzugleichen.
+          <p className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-6 leading-relaxed px-12">
+            SELLWERK Professional Search Engine Sync • Compliance v2.4
           </p>
         </div>
       </form>

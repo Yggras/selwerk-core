@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "problem_name": "brand_design_application",
+    "alignment_score": 100,
+    "last_sync": "2026-04-09T14:46:00Z"
+  },
+  "intent": {
+    "problem_statement": "Apply the official SELLWERK brand identity to the existing prototype foundation, ensuring visual consistency with sellwerk.de.",
+    "success_metrics": [
+      "Primary color #00AF9C implemented as main accent",
+      "Typography updated to modern sans-serif (Montserrat/Roboto)",
+      "Dashboard and Landing Page components reflect 'Professional yet friendly' tone",
+      "Responsive layout with generous white space"
+    ]
+  },
+  "constraints": {
+    "technical_stack": [
+      "Next.js 16",
+      "Tailwind CSS 4",
+      "Framer Motion",
+      "Lucide React"
+    ],
+    "performance_requirements": "Fast page loads, optimized font loading",
+    "limitations": [
+      "Stick to teal-based palette",
+      "No radical layout changes unless necessary for 'clean' feel"
+    ]
+  },
+  "architecture": {
+    "entities": [
+      "Theme Configuration",
+      "Global Styles",
+      "Typography System",
+      "Component Library (Dashboard, Auth, Feed)"
+    ],
+    "logic_flows": [
+      "CSS variables -> Tailwind Theme -> React Components"
+    ],
+    "state_management": "N/A (Style only)"
+  },
+  "decisions": [
+    {
+      "id": "brand_pivot_depth",
+      "decision": "Option B: Full Brand Pivot",
+      "rationale": "Aligns with SELLWERK's professional 'Mittelstand' target audience and avoids visual dissonance between playful naming and premium design.",
+      "impact": "Requires renaming 'Digital Janitor' UI elements, swapping techy icons for professional line icons, and using realistic imagery."
+    },
+    {
+      "id": "typography_and_assets",
+      "decision": "Option A: Google Fonts (Montserrat/Open Sans) + Custom SVG Logo",
+      "rationale": "Ensures high-fidelity brand matching and premium aesthetic as per SELLWERK design standards.",
+      "impact": "Requires integration of next/font/google, creation of a SELLWERK SVG component, and removal of generic 'Janitor' icons."
+    },
+    {
+      "id": "theme_strategy",
+      "decision": "Option A: Force Light Mode + rounded-xl styling",
+      "rationale": "Maintains brand consistency with SELLWERK's bright aesthetic and professional-yet-accessible button shapes.",
+      "impact": "Requires disabling CSS media queries for dark mode and standardizing border-radius across components."
+    },
+    {
+      "id": "core_copy",
+      "decision": "Option A: 'Ihr digitaler Erfolg im Mittelstand' headline",
+      "rationale": "Direct, confident, and professional alignment with SELLWERK's marketing tone.",
+      "impact": "Requires significant copy updates on the Landing Page and SEO meta tags."
+    }
+  ]
+}

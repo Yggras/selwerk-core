@@ -9,10 +9,11 @@ import { SyncDashboard } from "@/components/sync/SyncDashboard";
 import { useAudit } from "@/hooks/useAudit";
 import { useSync } from "@/hooks/useSync";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ShieldCheck, Zap, LogOut } from "lucide-react";
+import { ShieldCheck, LogOut, TrendingUp, CheckCircle2 } from "lucide-react";
 import { DigiScoreGauge } from "@/components/dashboard/DigiScoreGauge";
 import { GrowthFeed } from "@/components/dashboard/GrowthFeed";
 import { useRouter } from "next/navigation";
+import { SellwerkLogo } from "@/components/brand/SellwerkLogo";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function DashboardPage() {
   const [view, setView] = useState<"initial" | "scanning" | "ingesting" | "report" | "editor" | "sync" | "dashboard">("dashboard");
   const [userEmail, setUserEmail] = useState("");
 
-  // Auto-Scan Logic: The "Hook" Bridge
+  // Auto-Scan Logic
   useEffect(() => {
     const pendingUrl = sessionStorage.getItem("pending_url");
     if (pendingUrl && isAuthenticated) {
@@ -41,12 +42,10 @@ export default function DashboardPage() {
     if (isTriggering || isStorytellerActive || (auditData && auditData.status !== "complete")) {
       setView("scanning");
     } else if (auditData && auditData.status === "complete" && !isStorytellerActive && view === "scanning") {
-        // Option A: Feed Injection instead of Report View
         const performIngest = async () => {
             setView("ingesting");
             try {
                 await ingestAudit({ report_id: auditData.report_id, email: activeEmail || "" });
-                // Small delay for UX "Aha" moment
                 setTimeout(() => setView("dashboard"), 1500);
             } catch (err) {
                 console.error("Ingestion failed", err);
@@ -56,14 +55,6 @@ export default function DashboardPage() {
         performIngest();
     }
   }, [isTriggering, isStorytellerActive, auditData, view, ingestAudit, activeEmail]);
-
-  // Protected route check (redundant to middleware but good for UX)
-  useEffect(() => {
-    if (!isAuthenticated) {
-        // We'll let middleware handle the hard redirect, 
-        // but this ensures we don't show empty state if someone hangs around
-    }
-  }, [isAuthenticated, router]);
 
   const handleStartEditing = (email: string) => {
     setUserEmail(email);
@@ -80,27 +71,22 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col">
+    <main className="min-h-screen bg-white flex flex-col font-sans">
       {/* Header */}
-      <nav className="w-full px-6 py-6 flex justify-between items-center border-b border-slate-100 bg-white/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push("/")}>
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform">
-            <Zap className="text-white fill-white" size={20} />
-          </div>
-          <span className="text-xl font-black tracking-tight text-slate-800">
-            Digital<span className="text-blue-600">Janitor</span>
-          </span>
+      <nav className="w-full px-8 py-6 flex justify-between items-center border-b border-slate-100 bg-white sticky top-0 z-50">
+        <div className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity" onClick={() => router.push("/")}>
+          <SellwerkLogo size="md" />
         </div>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500">
-            {view === "sync" && <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold animate-pulse">Live Sync Active</span>}
-            <div className="flex items-center gap-4">
-                <div className="flex flex-col items-end hidden sm:flex">
+        <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-slate-500">
+            {view === "sync" && <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-bold animate-pulse">Live Sync Aktiv</span>}
+            <div className="flex items-center gap-6">
+                <div className="flex flex-col items-end hidden sm:flex border-r border-slate-100 pr-6">
                     <span className="text-xs font-black text-slate-800 tracking-tight">{activeEmail}</span>
-                    <span className="text-[10px] text-green-500 font-bold uppercase">Pro Janitor</span>
+                    <span className="text-[10px] text-primary font-bold uppercase tracking-wider">Premium Profil</span>
                 </div>
                 <button 
                     onClick={() => { logout(); router.push("/"); }}
-                    className="p-2.5 rounded-xl bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 transition-all"
+                    className="p-3 rounded-xl bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all border border-slate-100"
                 >
                     <LogOut size={18} />
                 </button>
@@ -125,25 +111,25 @@ export default function DashboardPage() {
           {view === "ingesting" && (
               <motion.div 
                 key="ingesting"
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-center p-12 bg-white rounded-[3rem] shadow-xl border border-blue-50 max-w-lg mx-auto"
+                className="text-center p-16 bg-white rounded-[2rem] shadow-2xl border border-slate-100 max-w-xl mx-auto"
               >
-                  <div className="w-20 h-20 bg-blue-600 rounded-3xl mx-auto flex items-center justify-center mb-8 shadow-lg shadow-blue-600/30">
-                      <Sparkles className="text-white animate-pulse" size={40} />
+                  <div className="w-24 h-24 bg-primary rounded-3xl mx-auto flex items-center justify-center mb-10 shadow-xl shadow-primary/20">
+                      <TrendingUp className="text-white animate-bounce" size={48} />
                   </div>
-                  <h3 className="text-2xl font-black text-slate-800 mb-4 tracking-tight">Ergebnisse werden eingespielt...</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">
-                      Wir wandeln deine Scan-Ergebnisse gerade in direkt umsetzbare Wachstums-Tasks um.
+                  <h3 className="text-3xl font-display font-black text-slate-900 mb-4 tracking-tighter leading-none">Analysen werden aufbereitet...</h3>
+                  <p className="text-slate-500 font-medium text-lg leading-relaxed">
+                      Wir wandeln Ihre Scan-Ergebnisse gerade in strategische Wachstumsschritte um.
                   </p>
-                  <div className="mt-8 flex justify-center gap-1">
+                  <div className="mt-10 flex justify-center gap-2">
                       {[0, 1, 2].map(i => (
                           <motion.div 
                             key={i}
-                            animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }}
+                            animate={{ scale: [1, 1.4, 1], opacity: [0.2, 1, 0.2] }}
                             transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.2 }}
-                            className="w-2 h-2 bg-blue-600 rounded-full"
+                            className="w-2.5 h-2.5 bg-primary rounded-full"
                           />
                       ))}
                   </div>
@@ -164,7 +150,7 @@ export default function DashboardPage() {
                         address: profile?.address || auditData?.detected_data?.detected_address,
                         phone: profile?.phone || auditData?.detected_data?.detected_phone,
                     }}
-                    onSave={handleStartSync}
+                    onSave={() => setView("dashboard")}
                   />
               </motion.div>
           )}
@@ -181,50 +167,55 @@ export default function DashboardPage() {
           )}
 
           {view === "dashboard" && (
-              <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-6xl">
-                  {/* Dashboard Header with Search Option */}
-                  <div className="flex justify-between items-end mb-12">
+              <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-7xl">
+                  {/* Dashboard Header */}
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16 px-4">
                       <div>
-                        <h2 className="text-4xl font-black text-slate-900 tracking-tight">Übersicht</h2>
-                        <p className="text-slate-500 font-medium">Willkommen in deinem Kontrollzentrum.</p>
+                        <div className="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-widest mb-2">
+                          <CheckCircle2 size={16} />
+                          Live Analyse Aktiv
+                        </div>
+                        <h2 className="text-5xl font-display font-black text-slate-900 tracking-tighter leading-none">Wachstums-Engine</h2>
+                        <p className="text-slate-500 font-medium text-lg mt-3">Steigern Sie Ihre regionale Sichtbarkeit im Mittelstand.</p>
                       </div>
-                      <div className="w-96">
+                      <div className="w-full md:w-[450px]">
                         <SearchInput 
                             onSearch={(url) => triggerAudit({ url })} 
                             isLoading={isTriggering} 
-                            placeholder="Neue Seite prüfen..."
+                            placeholder="Weitere Domain prüfen..."
                         />
                       </div>
                   </div>
 
-                  <div className="grid md:grid-cols-12 gap-8">
+                  <div className="grid lg:grid-cols-12 gap-10">
                     {/* Sidebar / Stats */}
-                    <div className="md:col-span-4 space-y-8">
-                        <div className="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm text-center relative overflow-hidden group">
-                           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-blue-500/10 transition-colors" />
+                    <div className="lg:col-span-4 space-y-10">
+                        <div className="bg-white border border-slate-100 p-10 rounded-[2rem] shadow-xl shadow-slate-200/50 text-center relative overflow-hidden group">
+                           <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors" />
                            <DigiScoreGauge score={profile?.digi_score || 0} />
-                           <div className="mt-6">
-                                <h4 className="text-xl font-black text-slate-800">Profil Status</h4>
-                                <p className="text-sm text-slate-400 mt-1">
-                                    {profile?.digi_score < 80 ? "Da geht noch was! Erledige heute ein Task." : "Exzellent! Dein Profil ist in Top-Form."}
+                           <div className="mt-8">
+                                <h4 className="text-2xl font-display font-black text-slate-900 tracking-tight">Digital Readiness</h4>
+                                <p className="text-slate-500 font-medium mt-2 leading-relaxed">
+                                    {profile?.digi_score < 80 ? "Optimieren Sie Ihre Daten für bessere Rankings." : "Hervorragend! Die Basis ist solide."}
                                 </p>
                            </div>
                         </div>
 
-                        <div className="bg-slate-900 text-white p-8 rounded-3xl relative overflow-hidden">
-                            <Zap className="absolute top-4 right-4 text-blue-500 opacity-20" size={48} />
-                            <h4 className="font-bold text-lg mb-2">Janitor Pro</h4>
-                            <p className="text-slate-400 text-sm leading-relaxed">
-                                Dein digitaler Hausmeister überwacht 42 Plattformen in Echtzeit.
+                        <div className="bg-primary-dark border border-primary-dark/20 text-white p-10 rounded-[2.5rem] relative overflow-hidden shadow-2xl group">
+                            <TrendingUp className="absolute top-6 right-6 text-primary opacity-20 group-hover:opacity-40 transition-opacity" size={56} />
+                            <h4 className="font-display font-black text-xl mb-4 tracking-tight">SELLWERK Pro</h4>
+                            <p className="text-white/60 font-medium leading-relaxed mb-8">
+                                Automatische Synchronisierung auf 42+ Plattformen und tägliches Monitoring.
                             </p>
-                            <div className="mt-6 flex items-center gap-2 text-xs font-bold text-blue-400">
-                                <ShieldCheck size={14} /> System-Status: Optimal
+                            <div className="pt-6 border-t border-white/10 flex items-center gap-3 text-sm font-bold text-primary">
+                                <ShieldCheck size={18} />
+                                <span className="uppercase tracking-widest">Premium Schutz Aktiv</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Main Content / Feed */}
-                    <div className="md:col-span-8">
+                    <div className="lg:col-span-8">
                         <GrowthFeed 
                             recommendations={recommendations} 
                             onComplete={completeRecommendation}
@@ -237,8 +228,11 @@ export default function DashboardPage() {
         </AnimatePresence>
       </div>
 
-      <footer className="w-full py-8 text-center text-slate-400 text-xs border-t border-slate-100 bg-white">
-        © 2024 Digital Janitor Labs • All rights reserved. • "Put your business on Autopilot."
+      <footer className="w-full py-10 text-center text-slate-400 text-sm border-t border-slate-100 bg-slate-50 mt-20">
+        <div className="max-w-7xl mx-auto px-8 flex justify-between items-center opacity-70 grayscale">
+          <SellwerkLogo size="sm" showTagline={false} />
+          <p>© 2024 SELLWERK • Partner des Mittelstands.</p>
+        </div>
       </footer>
     </main>
   );

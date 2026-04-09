@@ -3,8 +3,9 @@
 import { useSync } from "@/hooks/useSync";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, Zap, ArrowLeft } from "lucide-react";
+import { Mail, ArrowLeft, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { SellwerkLogo } from "@/components/brand/SellwerkLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,10 +28,10 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
+    <main className="min-h-screen bg-white flex flex-col items-center justify-center p-6 font-sans">
        <button 
         onClick={() => router.push("/")}
-        className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold transition-colors"
+        className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 hover:text-primary font-bold transition-colors"
        >
         <ArrowLeft size={18} />
         Zurück
@@ -39,44 +40,42 @@ export default function LoginPage() {
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        className="w-full max-w-lg"
       >
-          <div className="flex items-center gap-2 justify-center mb-12">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <Zap className="text-white fill-white" size={20} />
-            </div>
-            <span className="text-2xl font-black tracking-tight text-slate-800">
-                Digital<span className="text-blue-600">Janitor</span>
-            </span>
+          <div className="flex justify-center mb-16">
+            <SellwerkLogo size="lg" />
           </div>
 
-          <div className="bg-white border border-slate-100 p-10 rounded-3xl shadow-2xl shadow-blue-600/10 text-center">
-            <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Mail size={32} />
+          <div className="bg-white border border-slate-100 p-12 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 text-center relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+            <div className="relative z-10">
+                <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-primary/5 group-hover:scale-110 transition-transform duration-500">
+                    <ShieldCheck size={36} />
+                </div>
+                <h2 className="text-4xl font-display font-black text-slate-900 mb-3 tracking-tight">Willkommen zurück</h2>
+                <p className="text-slate-500 font-medium mb-10 leading-relaxed">Geben Sie Ihre E-Mail ein, um Zugriff auf Ihr SELLWERK Dashboard zu erhalten.</p>
+                
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <input 
+                        type="email" 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="mail@ihr-unternehmen.de"
+                        required
+                        className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-lg font-medium text-slate-800"
+                    />
+                    <button 
+                        type="submit"
+                        disabled={isLoggingIn}
+                        className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-lg hover:bg-primary transition-all shadow-2xl shadow-slate-900/10 hover:shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed group/btn flex items-center justify-center gap-2"
+                    >
+                        {isLoggingIn ? "Wird verifiziert..." : "Sicheres Login"}
+                    </button>
+                </form>
             </div>
-            <h2 className="text-3xl font-black text-slate-800 mb-2">Willkommen zurück</h2>
-            <p className="text-slate-500 mb-8">Gib deine E-Mail ein, um zu deinem Dashboard zu gelangen.</p>
-            
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <input 
-                    type="email" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="mail@dein-business.de"
-                    required
-                    className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:bg-white transition-all text-lg"
-                />
-                <button 
-                    type="submit"
-                    disabled={isLoggingIn}
-                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-lg hover:bg-blue-600 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
-                >
-                    {isLoggingIn ? "Meldel dich an..." : "Dashboard öffnen"}
-                </button>
-            </form>
           </div>
-          <p className="mt-8 text-center text-slate-400 text-sm">
-            Neu hier? Gib einfach deine Email ein, um dich zu registrieren.
+          <p className="mt-10 text-center text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed">
+            Neu hier? Ihre E-Mail registriert automatisch Ihr Profil.
           </p>
       </motion.div>
     </main>

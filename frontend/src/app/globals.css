@@ -13,6 +13,14 @@
   
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
+
+  --animate-shimmer: shimmer 2s infinite;
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%) skewX(12deg);
+    }
+  }
 }
 
 :root {

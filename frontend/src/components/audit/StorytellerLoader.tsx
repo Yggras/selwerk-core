@@ -108,12 +108,16 @@ export function StorytellerLoader({ progress }: StorytellerLoaderProps) {
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
-            transition={{ type: "spring", stiffness: 30, damping: 15 }}
+            transition={{ type: "tween", duration: 1.2, ease: [0.43, 0.13, 0.23, 0.96] }}
             className="h-full bg-primary rounded-full shadow-lg shadow-primary/20"
           />
         </div>
-        <p className="text-center mt-6 text-[10px] text-slate-400 font-black uppercase tracking-[0.1em]">
-          SELLWERK Artificial Intelligence Analysis Engine
+        <p className="text-center mt-6 text-[10px] font-black uppercase tracking-[0.1em] transition-colors">
+          {progress >= 95 ? (
+              <span className="text-primary animate-pulse">Finalizing AI Insights...</span>
+          ) : (
+              <span className="text-slate-400">SELLWERK Artificial Intelligence Analysis Engine</span>
+          )}
         </p>
       </div>
     </div>

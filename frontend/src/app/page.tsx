@@ -6,18 +6,35 @@ import { motion } from "framer-motion";
 import { ShieldCheck, Globe, ArrowUpCircle, User as UserIcon, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { SellwerkLogo } from "@/components/brand/SellwerkLogo";
+import { useRef } from "react";
+import gsap from "gsap";
 
 export default function LandingPage() {
   const router = useRouter();
   const { isTriggering } = useAudit();
+  const containerRef = useRef<HTMLElement>(null);
 
   const handleSearch = (url: string) => {
-    sessionStorage.setItem("pending_url", url);
-    router.push("/login");
+    if (containerRef.current) {
+      gsap.to(containerRef.current, {
+        scale: 0.95,
+        opacity: 0,
+        y: -30,
+        duration: 0.8,
+        ease: "power3.inOut",
+        onComplete: () => {
+          sessionStorage.setItem("pending_url", url);
+          router.push("/login");
+        }
+      });
+    } else {
+      sessionStorage.setItem("pending_url", url);
+      router.push("/login");
+    }
   };
 
   return (
-    <main className="min-h-screen bg-white flex flex-col">
+    <main ref={containerRef} className="min-h-screen bg-white flex flex-col">
       {/* Header */}
       <nav className="w-full px-8 py-6 flex justify-between items-center border-b border-slate-100 bg-white sticky top-0 z-50">
         <div 

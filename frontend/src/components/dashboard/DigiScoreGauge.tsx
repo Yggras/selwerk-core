@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 interface DigiScoreGaugeProps {
   score: number;
   size?: number;
+  isCalculating?: boolean;
 }
 
-export function DigiScoreGauge({ score, size = 200 }: DigiScoreGaugeProps) {
+export function DigiScoreGauge({ score, size = 200, isCalculating = false }: DigiScoreGaugeProps) {
   const [displayScore, setDisplayScore] = useState(0);
   const strokeWidth = size * 0.1;
   const radius = (size - strokeWidth) / 2;
@@ -63,17 +64,33 @@ export function DigiScoreGauge({ score, size = 200 }: DigiScoreGaugeProps) {
       </svg>
 
       {/* Center Content */}
-      <div className="text-center">
-        <motion.div 
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="text-6xl font-display font-black text-slate-900 tracking-tighter"
-        >
-          {Math.round(displayScore)}
-        </motion.div>
-        <div className="text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 mt-2">
-          Readiness
-        </div>
+      <div className="text-center absolute inset-0 flex flex-col items-center justify-center">
+        {isCalculating ? (
+          <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              className="flex flex-col items-center"
+          >
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-2" />
+              <div className="text-[10px] uppercase font-black tracking-widest text-primary animate-pulse">
+                Berechne...
+              </div>
+          </motion.div>
+        ) : (
+          <>
+            <motion.div 
+                key={displayScore}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="text-6xl font-display font-black text-slate-900 tracking-tighter"
+            >
+              {Math.round(displayScore)}
+            </motion.div>
+            <div className="text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 mt-1">
+              Readiness
+            </div>
+          </>
+        )}
       </div>
 
       {/* Pulsing Aura */}

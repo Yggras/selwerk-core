@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { AlertCircle, Trophy, Mail, ArrowRight, Lock, CheckCircle2 } from "lucide-react";
 import { type AuditSummary, type RedFlag } from "@/hooks/useAudit";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
 
 interface AuditReportProps {
   data: AuditSummary;
@@ -13,6 +14,17 @@ interface AuditReportProps {
 
 export function AuditReport({ data, onUnlock, isGated = true }: AuditReportProps) {
   const [email, setEmail] = useState("");
+  const flagsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (flagsRef.current && data.public_flags.length > 0) {
+        gsap.fromTo(
+           flagsRef.current.children,
+           { opacity: 0, z: -100, y: 50, scale: 0.9 },
+           { opacity: 1, z: 0, y: 0, scale: 1, duration: 0.6, stagger: 0.1, ease: "back.out(1.7)" }
+        );
+    }
+  }, [data.public_flags]);
 
   const scoreColor = data.overall_score !== undefined
     ? data.overall_score > 70 ? "text-primary" : data.overall_score > 40 ? "text-amber-500" : "text-red-500"
@@ -26,8 +38,12 @@ export function AuditReport({ data, onUnlock, isGated = true }: AuditReportProps
       className="w-full max-w-5xl mx-auto px-6 py-12 font-sans"
     >
       {/* Header Section */}
-      <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200/50 border border-slate-100 mb-10 flex flex-col md:flex-row items-center gap-10">
-        <div className="relative w-36 h-36 flex items-center justify-center">
+      <div className="bg-white/80 backdrop-blur-3xl rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200/50 border border-white/60 mb-10 flex flex-col md:flex-row items-center gap-10" style={{ perspective: 1000 }}>
+        <motion.div 
+            className="relative w-36 h-36 flex items-center justify-center rounded-full bg-white/50 backdrop-blur-xl border border-white/60 shadow-xl"
+            whileHover={{ rotateX: 15, rotateY: 15, scale: 1.05, z: 50 }}
+            style={{ transformStyle: "preserve-3d" }}
+        >
             <svg className="w-full h-full transform -rotate-90">
                 <circle cx="72" cy="72" r="66" stroke="currentColor" strokeWidth="10" fill="transparent" className="text-slate-100" />
                 <motion.circle 
@@ -39,11 +55,11 @@ export function AuditReport({ data, onUnlock, isGated = true }: AuditReportProps
                     className={scoreColor}
                 />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ transform: "translateZ(30px)" }}>
                 <span className="text-4xl font-display font-black text-slate-900 leading-none">{data.overall_score || "?"}</span>
                 <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mt-1">Score</span>
             </div>
-        </div>
+        </motion.div>
 
         <div className="flex-1 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-5">
@@ -64,9 +80,11 @@ export function AuditReport({ data, onUnlock, isGated = true }: AuditReportProps
             Dringende Handlungsfelder
         </h2>
         
-        {data.public_flags.map((flag, idx) => (
-            <FlagCard key={idx} flag={flag} />
-        ))}
+        <div ref={flagsRef} className="space-y-5" style={{ perspective: 1000 }}>
+            {data.public_flags.map((flag, idx) => (
+                <FlagCard key={idx} flag={flag} />
+            ))}
+        </div>
 
         {/* Gated Content */}
         {isGated && (
@@ -78,8 +96,8 @@ export function AuditReport({ data, onUnlock, isGated = true }: AuditReportProps
 
                 {/* Gating Card */}
                 <div className="absolute inset-0 flex items-center justify-center -top-6">
-                    <div className="bg-white/95 border border-slate-100 p-10 rounded-[3rem] shadow-2xl max-w-lg text-center backdrop-blur-sm">
-                        <div className="w-20 h-20 bg-primary text-white rounded-3xl mx-auto flex items-center justify-center mb-8 shadow-xl shadow-primary/20">
+                    <div className="bg-white/40 border border-white/50 p-10 rounded-[3rem] shadow-[0_20px_40px_rgba(0,0,0,0.05)] max-w-lg text-center backdrop-blur-2xl">
+                        <div className="w-20 h-20 bg-primary/90 backdrop-blur-xl text-white rounded-3xl mx-auto flex items-center justify-center mb-8 shadow-xl shadow-primary/20">
                             <Lock size={32} />
                         </div>
                         <h3 className="text-2xl font-display font-black text-slate-900 mb-3 tracking-tight">
@@ -125,7 +143,7 @@ function FlagCard({ flag }: { flag: RedFlag }) {
     const iconColor = flag.severity === "high" ? "text-red-500" : "text-amber-500";
     
     return (
-        <div className={`p-8 rounded-[2rem] border ${severityColor} flex gap-6 transition-all hover:scale-[1.01] hover:shadow-2xl hover:shadow-slate-200/40 group`}>
+        <div className={`p-8 rounded-[2rem] border ${severityColor} flex gap-6 transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(0,0,0,0.05)] hover:-translate-y-1 group bg-white/50 backdrop-blur-sm`}>
             <div className={`w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0 ${iconColor} group-hover:scale-110 transition-transform`}>
                 <AlertCircle size={28} />
             </div>

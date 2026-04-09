@@ -47,7 +47,7 @@ export function GrowthFeed({ recommendations, onComplete, isLoading }: GrowthFee
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ delay: index * 0.1 }}
-              className="group relative bg-white border border-slate-100 p-6 rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-500 overflow-hidden"
+              className="group relative bg-white/70 backdrop-blur-md border border-white/60 p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,175,156,0.1)] hover:-translate-y-2 hover:scale-[1.01] transition-all duration-500 overflow-hidden"
             >
               {/* Impact Badge */}
               <div className="absolute top-0 right-0 p-4">

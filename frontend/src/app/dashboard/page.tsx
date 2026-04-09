@@ -21,7 +21,7 @@ export default function DashboardPage() {
   const { 
     profile, updateProfile, triggerSync, syncData, isPaid, simulatePayment,
     isAuthenticated, logout, userEmail: activeEmail, recommendations, completeRecommendation,
-    ingestAudit, isIngesting
+    ingestAudit, isIngesting, isCompletingRec
   } = useSync();
 
   const [view, setView] = useState<"initial" | "scanning" | "ingesting" | "report" | "editor" | "sync" | "dashboard">("dashboard");
@@ -190,9 +190,9 @@ export default function DashboardPage() {
                   <div className="grid lg:grid-cols-12 gap-10">
                     {/* Sidebar / Stats */}
                     <div className="lg:col-span-4 space-y-10">
-                        <div className="bg-white border border-slate-100 p-10 rounded-[2rem] shadow-xl shadow-slate-200/50 text-center relative overflow-hidden group">
+                        <div className="bg-white/80 backdrop-blur-3xl border border-white/60 p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 text-center relative overflow-hidden group">
                            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-primary/10 transition-colors" />
-                           <DigiScoreGauge score={profile?.digi_score || 0} />
+                           <DigiScoreGauge score={profile?.digi_score || 0} isCalculating={isCompletingRec} />
                            <div className="mt-8">
                                 <h4 className="text-2xl font-display font-black text-slate-900 tracking-tight">Digital Readiness</h4>
                                 <p className="text-slate-500 font-medium mt-2 leading-relaxed">
@@ -201,10 +201,12 @@ export default function DashboardPage() {
                            </div>
                         </div>
 
-                        <div className="bg-primary-dark border border-primary-dark/20 text-white p-10 rounded-[2.5rem] relative overflow-hidden shadow-2xl group">
-                            <TrendingUp className="absolute top-6 right-6 text-primary opacity-20 group-hover:opacity-40 transition-opacity" size={56} />
+                        <div className="bg-primary-dark border border-primary-dark/20 text-white p-10 rounded-[2.5rem] relative overflow-hidden shadow-2xl group hover:-translate-y-1 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,175,156,0.2)]">
+                            {/* Shine Effect */}
+                            <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12" />
+                            <TrendingUp className="absolute top-6 right-6 text-primary opacity-20 group-hover:opacity-40 transition-opacity group-hover:scale-110 duration-500" size={56} />
                             <h4 className="font-display font-black text-xl mb-4 tracking-tight">SELLWERK Pro</h4>
-                            <p className="text-white/60 font-medium leading-relaxed mb-8">
+                            <p className="text-white/60 font-medium leading-relaxed mb-8 relative z-10">
                                 Automatische Synchronisierung auf 42+ Plattformen und tägliches Monitoring.
                             </p>
                             <div className="pt-6 border-t border-white/10 flex items-center gap-3 text-sm font-bold text-primary">
@@ -219,7 +221,7 @@ export default function DashboardPage() {
                         <GrowthFeed 
                             recommendations={recommendations} 
                             onComplete={completeRecommendation}
-                            isLoading={false}
+                            isLoading={isCompletingRec}
                         />
                     </div>
                   </div>

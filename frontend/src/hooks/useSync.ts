@@ -178,6 +178,7 @@ export function useSync() {
     recommendations: recommendationsQuery.data || [],
     isLoadingRecs: recommendationsQuery.isLoading,
     completeRecommendation: completeRecMutation.mutate,
+    isCompletingRec: completeRecMutation.isPending,
     ingestAudit: ingestAuditMutation.mutateAsync,
     isIngesting: ingestAuditMutation.isPending,
     logout: () => {

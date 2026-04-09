@@ -16,6 +16,7 @@ class ProfileResponse(ProfileBase):
     id: str
     user_id: Optional[str] = None
     shadow_id: Optional[str] = None
+    digi_score: int
     created_at: datetime
     updated_at: Optional[datetime] = None
 
@@ -32,3 +33,21 @@ class SyncStatusResponse(BaseModel):
     progress: int
     platform_status: Dict[str, str]
     checkout_url: Optional[str] = None
+
+class RecommendationResponse(BaseModel):
+    id: str
+    title: str
+    description: str
+    impact: int
+    status: str
+
+    class Config:
+        from_attributes = True
+
+class MagicLoginRequest(BaseModel):
+    email: EmailStr
+
+class AuthResponse(BaseModel):
+    email: EmailStr
+    token: str
+    profile: Optional[ProfileResponse] = None

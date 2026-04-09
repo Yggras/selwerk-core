@@ -28,11 +28,14 @@ class Profile(Base):
     website = Column(String)
     hours = Column(JSON) # e.g. {"mon": "09:00-18:00", ...}
     
+    digi_score = Column(Integer, default=42)
+    
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     user = relationship("User", back_populates="profiles")
     sync_jobs = relationship("SyncJob", back_populates="profile")
+    recommendations = relationship("GrowthRecommendation", back_populates="profile")
 
 class SyncJob(Base):
     __tablename__ = "sync_jobs"
@@ -48,3 +51,18 @@ class SyncJob(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     profile = relationship("Profile", back_populates="sync_jobs")
+
+class GrowthRecommendation(Base):
+    __tablename__ = "growth_recommendations"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    profile_id = Column(String, ForeignKey("profiles.id"), nullable=False)
+
+    title = Column(String, nullable=False)
+    description = Column(String)
+    impact = Column(Integer, default=5) # Digi-Score increase
+    status = Column(String, default="pending") # pending, completed
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    profile = relationship("Profile", back_populates="recommendations")

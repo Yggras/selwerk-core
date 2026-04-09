@@ -4,6 +4,14 @@ import { useAudit } from "./useAudit";
 
 const API_BASE = "http://localhost:8000/sync";
 
+export interface Recommendation {
+  id: string;
+  title: string;
+  description: string;
+  impact: number;
+  status: "pending" | "completed";
+}
+
 export interface SyncStatus {
     job_id: string;
     status: "processing" | "paid" | "completed";
@@ -14,6 +22,8 @@ export interface SyncStatus {
 export function useSync() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [shadowId, setShadowId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     let sid = localStorage.getItem("shadow_id");
@@ -22,6 +32,14 @@ export function useSync() {
       localStorage.setItem("shadow_id", sid);
     }
     setShadowId(sid);
+
+    // RESTORE SESSION
+    const savedEmail = localStorage.getItem("user_email");
+    const savedToken = localStorage.getItem("user_token");
+    if (savedEmail && savedToken) {
+        setEmail(savedEmail);
+        setToken(savedToken);
+    }
   }, []);
 
   const profileQuery = useQuery({
@@ -86,6 +104,45 @@ export function useSync() {
     },
   });
 
+  const magicLoginMutation = useMutation({
+    mutationFn: async (mail: string) => {
+      const res = await fetch(`http://localhost:8000/sync/auth/magic-login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: mail }),
+      });
+      const data = await res.json();
+      localStorage.setItem("user_email", data.email);
+      localStorage.setItem("user_token", data.token);
+      setEmail(data.email);
+      setToken(data.token);
+      return data;
+    }
+  });
+
+  const recommendationsQuery = useQuery({
+    queryKey: ["recommendations", email],
+    queryFn: async () => {
+      if (!email) return [];
+      const res = await fetch(`${API_BASE}/recommendations?email=${email}`);
+      return await res.json();
+    },
+    enabled: !!email,
+  });
+
+  const completeRecMutation = useMutation({
+    mutationFn: async (recId: string) => {
+      const res = await fetch(`${API_BASE}/recommendations/${recId}/complete`, {
+          method: "POST"
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+        recommendationsQuery.refetch();
+        profileQuery.refetch();
+    }
+  });
+
   return {
     profile: profileQuery.data,
     updateProfile: updateProfileMutation.mutate,
@@ -95,6 +152,21 @@ export function useSync() {
     syncData: statusQuery.data,
     jobId,
     simulatePayment: () => jobId && simulatePaymentMutation.mutate(jobId),
-    isPaid: statusQuery.data?.status === "paid" || statusQuery.data?.status === "completed"
+    isPaid: statusQuery.data?.status === "paid" || statusQuery.data?.status === "completed",
+    
+    // AUTH & DASHBOARD
+    isAuthenticated: !!email && !!token,
+    userEmail: email,
+    login: magicLoginMutation.mutate,
+    isLoggingIn: magicLoginMutation.isPending,
+    recommendations: recommendationsQuery.data || [],
+    isLoadingRecs: recommendationsQuery.isLoading,
+    completeRecommendation: completeRecMutation.mutate,
+    logout: () => {
+        localStorage.removeItem("user_email");
+        localStorage.removeItem("user_token");
+        setEmail(null);
+        setToken(null);
+    }
   };
 }

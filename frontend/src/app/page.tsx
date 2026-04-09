@@ -9,13 +9,17 @@ import { SyncDashboard } from "@/components/sync/SyncDashboard";
 import { useAudit } from "@/hooks/useAudit";
 import { useSync } from "@/hooks/useSync";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ShieldCheck, Zap } from "lucide-react";
-
+import { Sparkles, ShieldCheck, Zap, LogOut, User as UserIcon, Mail } from "lucide-react";
+import { DigiScoreGauge } from "@/components/dashboard/DigiScoreGauge";
+import { GrowthFeed } from "@/components/dashboard/GrowthFeed";
 export default function Home() {
   const { triggerAudit, isTriggering, auditData, isStorytellerActive } = useAudit();
-  const { profile, updateProfile, triggerSync, syncData, isPaid, simulatePayment } = useSync();
+  const { 
+    profile, updateProfile, triggerSync, syncData, isPaid, simulatePayment,
+    isAuthenticated, login, isLoggingIn, recommendations, completeRecommendation, logout, userEmail: activeEmail
+  } = useSync();
 
-  const [view, setView] = useState<"initial" | "scanning" | "report" | "editor" | "sync">("initial");
+  const [view, setView] = useState<"initial" | "scanning" | "report" | "editor" | "sync" | "dashboard" | "login">("initial");
   const [userEmail, setUserEmail] = useState("");
 
   // Handle Transitions
@@ -26,6 +30,13 @@ export default function Home() {
       setView("report");
     }
   }, [isTriggering, isStorytellerActive, auditData, view]);
+
+  // Auto-redirect if authenticated
+  useEffect(() => {
+    if (isAuthenticated && view === "initial") {
+        setView("dashboard");
+    }
+  }, [isAuthenticated, view]);
 
   const handleStartEditing = (email: string) => {
     setUserEmail(email);
@@ -39,6 +50,17 @@ export default function Home() {
         setView("sync");
       }
     });
+  };
+
+  const handleLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const email = formData.get("email") as string;
+    if (email) {
+        login(email, {
+            onSuccess: () => setView("dashboard")
+        });
+    }
   };
 
   return (
@@ -56,9 +78,28 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500">
             <a href="#" className="hover:text-blue-600 transition-colors">Wie es funktioniert</a>
             {view === "sync" && <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs font-bold animate-pulse">Live Sync Active</span>}
-            <button className="bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-all font-bold">
-                Dashboard
-            </button>
+            {isAuthenticated ? (
+                <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end hidden sm:flex">
+                        <span className="text-xs font-black text-slate-800 tracking-tight">{activeEmail}</span>
+                        <span className="text-[10px] text-green-500 font-bold uppercase">Pro Janitor</span>
+                    </div>
+                    <button 
+                        onClick={() => { logout(); setView("initial"); }}
+                        className="p-2.5 rounded-xl bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 transition-all"
+                    >
+                        <LogOut size={18} />
+                    </button>
+                </div>
+            ) : (
+                <button 
+                    onClick={() => setView("login")}
+                    className="bg-slate-900 text-white px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-all font-bold flex items-center gap-2"
+                >
+                    <UserIcon size={16} />
+                    Login
+                </button>
+            )}
         </div>
       </nav>
 
@@ -136,6 +177,78 @@ export default function Home() {
                     isPaid={isPaid}
                     onSimulatePayment={simulatePayment}
                   />
+              </motion.div>
+          )}
+
+          {view === "login" && (
+              <motion.div key="login" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-md">
+                  <div className="bg-white border border-slate-100 p-10 rounded-3xl shadow-2xl shadow-blue-600/10 text-center">
+                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <Mail size={32} />
+                    </div>
+                    <h2 className="text-3xl font-black text-slate-800 mb-2">Willkommen zurück</h2>
+                    <p className="text-slate-500 mb-8">Gib deine E-Mail ein, um zu deinem Dashboard zu gelangen.</p>
+                    
+                    <form onSubmit={handleLoginSubmit} className="space-y-4">
+                        <input 
+                            name="email"
+                            type="email" 
+                            placeholder="mail@dein-business.de"
+                            required
+                            className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:bg-white transition-all text-lg"
+                        />
+                        <button 
+                            type="submit"
+                            disabled={isLoggingIn}
+                            className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-lg hover:bg-blue-600 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50"
+                        >
+                            {isLoggingIn ? "Meldel dich an..." : "Dashboard öffnen"}
+                        </button>
+                    </form>
+                    <button onClick={() => setView("initial")} className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors">
+                        Zurück zur Startseite
+                    </button>
+                  </div>
+              </motion.div>
+          )}
+
+          {view === "dashboard" && (
+              <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-6xl">
+                  <div className="grid md:grid-cols-12 gap-8">
+                    {/* Sidebar / Stats */}
+                    <div className="md:col-span-4 space-y-8">
+                        <div className="bg-white border border-slate-100 p-8 rounded-3xl shadow-sm text-center relative overflow-hidden group">
+                           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-blue-500/10 transition-colors" />
+                           <DigiScoreGauge score={profile?.digi_score || 0} />
+                           <div className="mt-6">
+                                <h4 className="text-xl font-black text-slate-800">Profil Status</h4>
+                                <p className="text-sm text-slate-400 mt-1">
+                                    {profile?.digi_score < 80 ? "Da geht noch was! Erledige heute ein Task." : "Exzellent! Dein Profil ist in Top-Form."}
+                                </p>
+                           </div>
+                        </div>
+
+                        <div className="bg-slate-900 text-white p-8 rounded-3xl relative overflow-hidden">
+                            <Zap className="absolute top-4 right-4 text-blue-500 opacity-20" size={48} />
+                            <h4 className="font-bold text-lg mb-2">Janitor Pro</h4>
+                            <p className="text-slate-400 text-sm leading-relaxed">
+                                Dein digitaler Hausmeister überwacht 42 Plattformen in Echtzeit.
+                            </p>
+                            <div className="mt-6 flex items-center gap-2 text-xs font-bold text-blue-400">
+                                <ShieldCheck size={14} /> System-Status: Optimal
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content / Feed */}
+                    <div className="md:col-span-8">
+                        <GrowthFeed 
+                            recommendations={recommendations} 
+                            onComplete={completeRecommendation}
+                            isLoading={false}
+                        />
+                    </div>
+                  </div>
               </motion.div>
           )}
         </AnimatePresence>

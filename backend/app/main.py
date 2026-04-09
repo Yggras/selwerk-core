@@ -7,8 +7,9 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables
+    # Recreate tables for prototype schema updates
     async with engine.begin() as conn:
+        # await conn.run_sync(Base.metadata.drop_all) # UNCOMMENT IF SCHEMA CHANGE NEEDED
         await conn.run_sync(Base.metadata.create_all)
     yield
 

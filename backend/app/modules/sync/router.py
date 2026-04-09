@@ -2,10 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Header
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from app.database import get_db
-from app.models import User, Profile, SyncJob
-from .schemas import ProfileUpdate, ProfileResponse, SyncTriggerRequest, SyncStatusResponse
+from app.models import User, Profile, SyncJob, GrowthRecommendation
+from .schemas import (
+    ProfileUpdate, ProfileResponse, SyncTriggerRequest, 
+    SyncStatusResponse, RecommendationResponse, MagicLoginRequest, AuthResponse
+)
 from .engine import SyncEngine
-from typing import Optional
+from typing import Optional, List
 import uuid
 
 router = APIRouter(prefix="/sync", tags=["Magic Sync"])
@@ -124,3 +127,100 @@ async def simulate_payment(job_id: str, background_tasks: BackgroundTasks, db: A
     background_tasks.add_task(engine.complete_sync, job_id)
     
     return {"status": "payment_received"}
+
+@router.post("/auth/magic-login", response_model=AuthResponse)
+async def magic_login(request: MagicLoginRequest, db: AsyncSession = Depends(get_db)):
+    # 1. Find or Create User
+    result = await db.execute(select(User).where(User.email == request.email))
+    user = result.scalars().first()
+    
+    if not user:
+        user = User(email=request.email)
+        db.add(user)
+        await db.flush()
+    
+    # 2. Get the latest profile for this user
+    result = await db.execute(select(Profile).where(Profile.user_id == user.id))
+    profile = result.scalars().first()
+    
+    if not profile:
+        profile = Profile(
+            user_id=user.id,
+            business_name="Dein Business (Entwurf)",
+            digi_score=42
+        )
+        db.add(profile)
+        await db.flush()
+    
+    # 3. Seed recommendations if none exist
+    res = await db.execute(select(GrowthRecommendation).where(GrowthRecommendation.profile_id == profile.id))
+    if not res.scalars().first():
+        seeds = [
+            GrowthRecommendation(
+                profile_id=profile.id,
+                title="Antworte auf dein neuestes Google-Review",
+                description="Kundenbindung steigern: Ein kurzes 'Danke' reicht oft aus.",
+                impact=10
+            ),
+            GrowthRecommendation(
+                profile_id=profile.id,
+                title="Lade ein aktuelles Foto deines Teams hoch",
+                description="Persönlichkeit schafft Vertrauen. Ein aktuelles Bild erhöht Klicks um 20%.",
+                impact=15
+            ),
+            GrowthRecommendation(
+                profile_id=profile.id,
+                title="Öffnungszeiten für den nächsten Feiertag prüfen",
+                description="Vermeide frustrierte Kunden vor verschlossenen Türen.",
+                impact=5
+            )
+        ]
+        db.add_all(seeds)
+    
+    await db.commit()
+    
+    return AuthResponse(
+        email=user.email,
+        token=f"mock_token_{uuid.uuid4().hex[:8]}",
+        profile=profile
+    )
+
+@router.get("/recommendations", response_model=List[RecommendationResponse])
+async def get_recommendations(
+    email: str,
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(
+        select(GrowthRecommendation)
+        .join(Profile)
+        .join(User)
+        .where(User.email == email)
+        .where(GrowthRecommendation.status == "pending")
+        .limit(3)
+    )
+    return result.scalars().all()
+
+@router.post("/recommendations/{rec_id}/complete")
+async def complete_recommendation(
+    rec_id: str,
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(select(GrowthRecommendation).where(GrowthRecommendation.id == rec_id))
+    rec = result.scalars().first()
+    
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recommendation not found")
+        
+    if rec.status == "completed":
+        return {"status": "already_completed"}
+
+    rec.status = "completed"
+    
+    # Update Digi-Score on Profile
+    res = await db.execute(select(Profile).where(Profile.id == rec.profile_id))
+    profile = res.scalars().first()
+    if profile:
+        profile.digi_score = min(profile.digi_score + rec.impact, 100)
+    
+    await db.commit()
+    return {"new_score": profile.digi_score if profile else 0}

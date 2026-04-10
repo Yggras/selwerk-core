@@ -12,6 +12,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, LogOut, TrendingUp, CheckCircle2, Settings, ArrowRight } from "lucide-react";
 import { DigiScoreGauge } from "@/components/dashboard/DigiScoreGauge";
 import { GrowthFeed } from "@/components/dashboard/GrowthFeed";
+import { OnboardingWizard } from "@/components/dashboard/OnboardingWizard";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { useRouter } from "next/navigation";
 import { SellwerkLogo } from "@/components/brand/SellwerkLogo";
 
@@ -23,6 +25,8 @@ export default function DashboardPage() {
     isAuthenticated, logout, userEmail: activeEmail, recommendations, completeRecommendation,
     ingestAudit, isIngesting, isCompletingRec
   } = useSync();
+
+  const onboarding = useOnboarding();
 
   const [view, setView] = useState<"initial" | "scanning" | "ingesting" | "report" | "editor" | "sync" | "dashboard">("dashboard");
   const [userEmail, setUserEmail] = useState("");
@@ -46,15 +50,20 @@ export default function DashboardPage() {
             setView("ingesting");
             try {
                 await ingestAudit({ report_id: auditData.report_id, email: activeEmail || "" });
-                setTimeout(() => setView("dashboard"), 1500);
+                // Transition to Discovery phase after ingest
+                setTimeout(() => {
+                  onboarding.showDiscovery();
+                  setView("dashboard");
+                }, 1500);
             } catch (err) {
                 console.error("Ingestion failed", err);
+                onboarding.showDiscovery();
                 setView("dashboard");
             }
         };
         performIngest();
     }
-  }, [isTriggering, isStorytellerActive, auditData, view, ingestAudit, activeEmail]);
+  }, [isTriggering, isStorytellerActive, auditData, view, ingestAudit, activeEmail, onboarding]);
 
   const handleStartEditing = (email: string) => {
     setUserEmail(email);
@@ -95,6 +104,20 @@ export default function DashboardPage() {
       </nav>
 
       <div className="flex-1 flex flex-col items-center justify-center py-12 px-6">
+        {/* ── Onboarding Wizard Overlay (Discovery + Celebration only) ── */}
+        <AnimatePresence>
+          {onboarding.isHydrated && (onboarding.phase === "DISCOVERY" || onboarding.phase === "CELEBRATION") && (
+            <OnboardingWizard
+              phase={onboarding.phase as "DISCOVERY" | "CELEBRATION"}
+              totalScore={onboarding.totalScore}
+              completedCount={onboarding.completedIds.length}
+              onShowPriorities={onboarding.showPriorities}
+              onContinue={onboarding.continueAfterCelebration}
+              onDismiss={onboarding.dismissOnboarding}
+            />
+          )}
+        </AnimatePresence>
+
         <AnimatePresence mode="wait">
           {view === "scanning" && (
             <motion.div
@@ -244,6 +267,10 @@ export default function DashboardPage() {
                             recommendations={recommendations} 
                             onComplete={completeRecommendation}
                             isLoading={isCompletingRec}
+                            actionItems={onboarding.currentBatch}
+                            completedActionIds={onboarding.completedIds}
+                            onActionComplete={onboarding.completeItem}
+                            batchIndex={onboarding.currentBatchIndex}
                         />
                     </div>
                   </div>

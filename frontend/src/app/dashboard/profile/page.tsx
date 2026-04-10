@@ -20,6 +20,8 @@ import { motion } from "framer-motion";
 import { useSync } from "@/hooks/useSync";
 import { useRouter } from "next/navigation";
 import { SellwerkLogo } from "@/components/brand/SellwerkLogo";
+import { StrategyBridge } from "@/components/dashboard/StrategyBridge";
+import { Suspense } from "react";
 
 // ─── Schema ──────────────────────────────────
 const profileSchema = z.object({
@@ -84,7 +86,7 @@ function Field({
 }
 
 // ─── Page Component ──────────────────────────
-export default function ProfilePage() {
+function ProfilePageContent() {
   const router = useRouter();
   const { profile, updateProfile, isUpdating, isAuthenticated } = useSync();
 
@@ -132,6 +134,7 @@ export default function ProfilePage() {
 
   return (
     <main className="min-h-screen bg-white flex flex-col font-sans">
+      <StrategyBridge />
       {/* ── Header ─────────────────────────── */}
       <nav className="w-full px-8 py-6 flex justify-between items-center border-b border-slate-100 bg-white sticky top-0 z-50">
         <div
@@ -304,5 +307,13 @@ export default function ProfilePage() {
         </motion.div>
       </div>
     </main>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense>
+      <ProfilePageContent />
+    </Suspense>
   );
 }

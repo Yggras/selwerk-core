@@ -1,8 +1,8 @@
 {
   "meta": {
     "problem_name": "mock_data_journey",
-    "alignment_score": 25,
-    "last_sync": "2026-04-09T20:00:10Z"
+    "alignment_score": 100,
+    "last_sync": "2026-04-10T08:10:00Z"
   },
   "intent": {
     "problem_statement": "Add a comprehensive set of mock data to the Digi-check (Audit) that brings 3 Action Items per category (Listing, Reputation, Social Media, Website) and maps them to specific product modules.",
@@ -49,6 +49,61 @@
       "issue": "UX Strategy for Audit Results",
       "status": "COMPLETED",
       "resolution": "Option B (Strategic Reveal). A multi-stage reveal starting with 'Problems Found' followed by a cinematic transition to a 'Priority Action List'."
+    },
+    {
+      "issue": "Discovery Dashboard Visualization",
+      "status": "COMPLETED",
+      "resolution": "Option B (Score Card). 4 large Category Rings showing 'X critical items found', avoiding visual overload initially."
+    },
+    {
+      "issue": "Registration Flow & Momentum",
+      "status": "COMPLETED",
+      "resolution": "Auto-trigger scan after registration to maintain momentum; no intermediate calibration step."
+    },
+    {
+      "issue": "Action Item Interaction Logic",
+      "status": "COMPLETED",
+      "resolution": "Option B (The Magic Bridge). A contextual UI that guides the user from the Priority List to the specific field in the module."
+    },
+    {
+      "issue": "Inventory & Batching Logic",
+      "status": "COMPLETED",
+      "resolution": "Batching Model (Max 3 at once). Items are drip-fed to avoid overwhelming the user. Next batch is revealed upon completion of the current one."
+    },
+    {
+      "issue": "Terminology & Localization",
+      "status": "COMPLETED",
+      "resolution": "Hybrid Professional German (Online-Präsenz, Kunden-Stimmen, etc.) with English sub-titles."
+    },
+    {
+      "issue": "Selection Strategy (Batch 1)",
+      "status": "COMPLETED",
+      "resolution": "Option B (Product Tour). The first batch contains 1 item from each major category to demonstrate platform breadth."
+    },
+    {
+      "issue": "The Magic Bridge UX",
+      "status": "COMPLETED",
+      "resolution": "Option B (Top Strategy Bar). A high-contrast bar at the top of the module page for clear guidance."
+    },
+    {
+      "issue": "Batch Refill Transition",
+      "status": "COMPLETED",
+      "resolution": "Option B (Choice Moment). A celebratory overlay triggers after the 3rd task, giving the user the choice to continue."
+    },
+    {
+      "issue": "Discovery Metrics (Score Card)",
+      "status": "COMPLETED",
+      "resolution": "4 Metric Rings: Präsenz-Tiefe, Kunden-Vertrauen, Digitale Reichweite, Web-Integrität. Global score prominently displayed."
+    },
+    {
+      "issue": "Route Implementation",
+      "status": "COMPLETED",
+      "resolution": "Option A (Modal Hijack). The entire onboarding sequence lives as a stateful overlay on the /dashboard route."
+    },
+    {
+      "issue": "Persistence Strategy",
+      "status": "COMPLETED",
+      "resolution": "Local Storage. Completion state is persisted locally to survive refreshes during prototype testing."
     }
   ]
 }

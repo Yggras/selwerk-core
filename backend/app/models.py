@@ -60,6 +60,12 @@ class GrowthRecommendation(Base):
 
     title = Column(String, nullable=False)
     description = Column(String)
+    category = Column(String, nullable=True)
+    severity = Column(String, nullable=True)
+    platform = Column(String, nullable=True)
+    target_route = Column(String, nullable=True)
+    cta_label = Column(String, nullable=True)
+    mission_key = Column(String, nullable=True)
     impact = Column(Integer, default=5) # Digi-Score increase
     status = Column(String, default="pending") # pending, completed
 

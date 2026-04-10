@@ -3,9 +3,9 @@
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Target, ArrowLeft, CheckCircle2, X } from "lucide-react";
-import { getItemByMissionKey } from "@/mocks/auditMockData";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSync } from "@/hooks/useSync";
 
 // ─── Strategy Bridge ─────────────────────────────────────
 // High-contrast top bar that appears when a user arrives
@@ -16,12 +16,13 @@ import { useRouter } from "next/navigation";
 export function StrategyBridge() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { recommendations, completeRecommendation, isCompletingRec } = useSync();
   const missionKey = searchParams.get("mission");
   const [dismissed, setDismissed] = useState(false);
 
   if (!missionKey || dismissed) return null;
 
-  const item = getItemByMissionKey(missionKey);
+  const item = recommendations.find((rec) => rec.mission_key === missionKey);
   if (!item) return null;
 
   return (
@@ -68,13 +69,22 @@ export function StrategyBridge() {
         {/* Done */}
         <button
           onClick={() => {
-            setDismissed(true);
-            router.push("/dashboard");
+            completeRecommendation(item.id, {
+              onSuccess: () => {
+                setDismissed(true);
+                router.push("/dashboard");
+              },
+              onError: () => {
+                setDismissed(true);
+                router.push("/dashboard");
+              },
+            });
           }}
+          disabled={isCompletingRec}
           className="flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-primary/20"
         >
           <CheckCircle2 size={14} />
-          Erledigt
+          {isCompletingRec ? "Speichere..." : "Erledigt"}
         </button>
 
         {/* Dismiss */}

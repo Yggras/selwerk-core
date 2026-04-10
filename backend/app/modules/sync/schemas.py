@@ -38,6 +38,12 @@ class RecommendationResponse(BaseModel):
     id: str
     title: str
     description: str
+    category: Optional[str] = None
+    severity: Optional[str] = None
+    platform: Optional[str] = None
+    target_route: Optional[str] = None
+    cta_label: Optional[str] = None
+    mission_key: Optional[str] = None
     impact: int
     status: str
 

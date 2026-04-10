@@ -17,6 +17,87 @@ import uuid
 router = APIRouter(prefix="/sync", tags=["Magic Sync"])
 engine = SyncEngine()
 
+RECOMMENDATION_METADATA_BY_FLAG = {
+    "LEGAL_FORM_MISSING": {
+        "category": "listing",
+        "target_route": "/dashboard/profile",
+        "cta_label": "Firmennamen korrigieren",
+        "mission_key": "legal_form_missing",
+    },
+    "DUPLICATE_GOOGLE_LISTING": {
+        "category": "listing",
+        "target_route": "/dashboard/profile",
+        "cta_label": "Duplikate bereinigen",
+        "mission_key": "duplicate_google",
+    },
+    "INCONSISTENT_HOURS": {
+        "category": "listing",
+        "target_route": "/dashboard/profile",
+        "cta_label": "Zeiten synchronisieren",
+        "mission_key": "inconsistent_hours",
+    },
+    "MISSING_PHONE_COVERAGE": {
+        "category": "listing",
+        "target_route": "/dashboard/profile",
+        "cta_label": "Nummer hinterlegen",
+        "mission_key": "missing_phone",
+    },
+    "UNANSWERED_NEGATIVE_REVIEW": {
+        "category": "reputation",
+        "target_route": "/dashboard/reputation",
+        "cta_label": "Jetzt antworten",
+        "mission_key": "unanswered_review",
+    },
+    "LOW_AVERAGE_RATING": {
+        "category": "reputation",
+        "target_route": "/dashboard/reputation",
+        "cta_label": "Strategie starten",
+        "mission_key": "low_rating",
+    },
+    "LOW_REVIEW_RESPONSE_RATE": {
+        "category": "reputation",
+        "target_route": "/dashboard/reputation",
+        "cta_label": "Antworten verbessern",
+        "mission_key": "low_response_rate",
+    },
+    "FACEBOOK_NAME_MISMATCH": {
+        "category": "social",
+        "target_route": "/dashboard/social",
+        "cta_label": "Profil angleichen",
+        "mission_key": "facebook_mismatch",
+    },
+    "INSTAGRAM_INACTIVE": {
+        "category": "social",
+        "target_route": "/dashboard/social",
+        "cta_label": "Posting planen",
+        "mission_key": "instagram_inactive",
+    },
+    "LINKEDIN_UNCLAIMED": {
+        "category": "social",
+        "target_route": "/dashboard/social",
+        "cta_label": "Seite beanspruchen",
+        "mission_key": "linkedin_unclaimed",
+    },
+    "MOBILE_PAGESPEED_CRITICAL": {
+        "category": "website",
+        "target_route": "/dashboard/editor",
+        "cta_label": "Performance verbessern",
+        "mission_key": "pagespeed_critical",
+    },
+    "GDPR_BANNER_INVALID": {
+        "category": "website",
+        "target_route": "/dashboard/editor",
+        "cta_label": "Banner absichern",
+        "mission_key": "gdpr_banner",
+    },
+    "CONTACT_FORM_VALIDATION_BROKEN": {
+        "category": "website",
+        "target_route": "/dashboard/editor",
+        "cta_label": "Formular reparieren",
+        "mission_key": "contact_form_broken",
+    },
+}
+
 @router.post("/ingest-audit")
 async def ingest_audit(
     request: AuditIngestRequest,
@@ -56,11 +137,33 @@ async def ingest_audit(
 
     new_recs = []
     for flag in all_flags:
+        impact = 5
+        if flag.severity == "high":
+            impact = 15
+        elif flag.severity == "medium":
+            impact = 10
+
+        metadata = RECOMMENDATION_METADATA_BY_FLAG.get(
+            flag.type,
+            {
+                "category": "listing",
+                "target_route": "/dashboard/profile",
+                "cta_label": "Jetzt beheben",
+                "mission_key": f"generic_{flag.type.lower()}",
+            },
+        )
+
         new_recs.append(GrowthRecommendation(
             profile_id=profile.id,
             title=flag.title,
             description=flag.description,
-            impact=10 if flag.severity == "high" else 5,
+            category=metadata["category"],
+            severity=flag.severity,
+            platform=flag.platform,
+            target_route=metadata["target_route"],
+            cta_label=metadata["cta_label"],
+            mission_key=metadata["mission_key"],
+            impact=impact,
             status="pending"
         ))
     
@@ -218,18 +321,36 @@ async def magic_login(request: MagicLoginRequest, db: AsyncSession = Depends(get
                 profile_id=profile.id,
                 title="Antworte auf dein neuestes Google-Review",
                 description="Kundenbindung steigern: Ein kurzes 'Danke' reicht oft aus.",
+                category="reputation",
+                severity="medium",
+                platform="Google",
+                target_route="/dashboard/reputation",
+                cta_label="Antwort verfassen",
+                mission_key="seed_review_reply",
                 impact=10
             ),
             GrowthRecommendation(
                 profile_id=profile.id,
                 title="Lade ein aktuelles Foto deines Teams hoch",
                 description="Persönlichkeit schafft Vertrauen. Ein aktuelles Bild erhöht Klicks um 20%.",
+                category="social",
+                severity="medium",
+                platform="Instagram",
+                target_route="/dashboard/social",
+                cta_label="Foto-Update starten",
+                mission_key="seed_team_photo",
                 impact=15
             ),
             GrowthRecommendation(
                 profile_id=profile.id,
                 title="Öffnungszeiten für den nächsten Feiertag prüfen",
                 description="Vermeide frustrierte Kunden vor verschlossenen Türen.",
+                category="listing",
+                severity="low",
+                platform="Google",
+                target_route="/dashboard/profile",
+                cta_label="Zeiten prüfen",
+                mission_key="seed_holiday_hours",
                 impact=5
             )
         ]
@@ -254,7 +375,7 @@ async def get_recommendations(
         .join(User)
         .where(User.email == email)
         .where(GrowthRecommendation.status == "pending")
-        .limit(3)
+        .order_by(GrowthRecommendation.impact.desc(), GrowthRecommendation.created_at.desc())
     )
     return result.scalars().all()
 

@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
-import { useAudit } from "./useAudit";
+import { useEffect, useState } from "react";
 
 const API_BASE = "http://localhost:8000/sync";
 
@@ -8,6 +7,12 @@ export interface Recommendation {
   id: string;
   title: string;
   description: string;
+  category?: "listing" | "reputation" | "social" | "website";
+  severity?: "high" | "medium" | "low";
+  platform?: string;
+  target_route?: string;
+  cta_label?: string;
+  mission_key?: string;
   impact: number;
   status: "pending" | "completed";
 }
@@ -19,6 +24,14 @@ export interface SyncStatus {
     platform_status: Record<string, string>;
 }
 
+type ProfilePayload = {
+  business_name: string;
+  address?: string;
+  phone?: string;
+  website?: string;
+  hours?: Record<string, string>;
+};
+
 export function useSync() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [shadowId, setShadowId] = useState<string | null>(null);
@@ -26,20 +39,24 @@ export function useSync() {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    let sid = localStorage.getItem("shadow_id");
-    if (!sid) {
-      sid = crypto.randomUUID();
-      localStorage.setItem("shadow_id", sid);
-    }
-    setShadowId(sid);
+    const restoreSession = () => {
+      let sid = localStorage.getItem("shadow_id");
+      if (!sid) {
+        sid = crypto.randomUUID();
+        localStorage.setItem("shadow_id", sid);
+      }
+      setShadowId(sid);
 
-    // RESTORE SESSION
-    const savedEmail = localStorage.getItem("user_email");
-    const savedToken = localStorage.getItem("user_token");
-    if (savedEmail && savedToken) {
+      const savedEmail = localStorage.getItem("user_email");
+      const savedToken = localStorage.getItem("user_token");
+
+      if (savedEmail && savedToken) {
         setEmail(savedEmail);
         setToken(savedToken);
-    }
+      }
+    };
+
+    queueMicrotask(restoreSession);
   }, []);
 
   const profileQuery = useQuery({
@@ -55,7 +72,7 @@ export function useSync() {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: ProfilePayload) => {
       const res = await fetch(`${API_BASE}/profile`, {
         method: "POST",
         headers: { 
@@ -126,7 +143,7 @@ export function useSync() {
     queryFn: async () => {
       if (!email) return [];
       const res = await fetch(`${API_BASE}/recommendations?email=${email}`);
-      return await res.json();
+      return (await res.json()) as Recommendation[];
     },
     enabled: !!email,
   });
